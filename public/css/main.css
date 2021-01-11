@@ -29,6 +29,11 @@ div.spacer {
     padding: 15px;
 }
 
+nav a.navbar-brand img {
+    width: 32px;
+    transform: translateY(-3px);
+}
+
 nav div.navbar-collapse ul.navbar-nav {
     margin-bottom: 0 !important;
 }
