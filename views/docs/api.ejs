@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API - Perid</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/main.css">
+</head>
+<body>
+    <div class="container">
+        <%- include('../partials/header') %> 
+
+        <div class="wraper">
+            <!-- What's PID -->
+            <fieldset>
+                <legend>What's Perid</legend>
+                <p>
+                    Perid is the Personal Id that contains some basic information about you. <br>
+                    You can share it with people to get in touch with you.
+                </p>
+            </fieldset>
+            <div class="spacer"></div>
+            <!-- API Documention -->
+            <fieldset>
+                <legend>API Documention</legend>
+                <p>
+                    Perid also provides an API that you can use in your app to find a user registered is our databases. <br>
+                    The usage of it is fairly simple;
+                    <h5>> Get user by Id</h5>
+                    Getting a user by Id requires a GET request to <code>https://perid.tk/api/[pid]</code></p>
+                    <p>
+                        The API returns a json object that contains: <br>
+                        An <code>error</code> boolean, if true there was an error if not request operated successfully. <br>
+                        If there was an error the api returns a <code>message</code> string that contains a message explaining the error. <br>
+                        If there was no error the api returns a boolean <code>foundId</code> that specifies if the given id is registered to a user. <br>
+                        If a user is found then the api returns an object <code>Id</code> that contains the found user.
+                    </p>
+                    The json object that the API returns looks like this: <br>
+                    <div class="code-container" style="margin-top: 10px;">
+                        <code>
+                            {<br>
+                                &emsp;error: false,<br>
+                                &emsp;foundId: true,<br>
+                                &emsp;Id: {<br>
+                                &emsp;&emsp;firstName: "John",<br>
+                                &emsp;&emsp;middleName: "",<br>
+                                &emsp;&emsp;lastName: "Smith",<br>
+                                &emsp;&emsp;birthdate: "2001-05-28T00:00:00.000+00:00",<br>
+                                &emsp;&emsp;phone: "202-555-0104",<br>
+                                &emsp;&emsp;email: "jhon.smith@outlook.com"<br>
+                                &emsp;}<br>
+                            }
+                        </code>
+                    </div>
+                </p>
+            </fieldset>
+        </div>
+    </div>
+</body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
+</html>
