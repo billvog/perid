@@ -13,7 +13,16 @@ const app = express();
 // Passport config
 require('./config/passport')(passport);
 
-mongoose.connect(process.env.LOCAL_DB_URI || process.env.DB_URI, {
+var MongoDbUri;
+if (process.env.NODE_ENV === "production") {
+    MongoDbUri = process.env.DB_URI;
+}
+else {
+    MongoDbUri = process.env.LOCAL_DB_URI;
+}
+
+console.log(`Connected to ${MongoDbUri}`);
+mongoose.connect(MongoDbUri, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 });
