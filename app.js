@@ -13,7 +13,7 @@ const app = express();
 // Passport config
 require('./config/passport')(passport);
 
-mongoose.connect(process.env.DB_URI, {
+mongoose.connect(process.env.LOCAL_DB_URI || process.env.DB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 });
@@ -24,7 +24,7 @@ database.on('error', (error) => console.log(error));
 app.set('view engine', 'ejs');
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ limit: '10mb', extended: false }));
 app.use(methodOverride('_m'));
 app.use(flash());
 app.use(session({
@@ -48,5 +48,13 @@ app.use('/', require('./routes/index'));
 app.use('/account', require('./routes/account'));
 app.use('/api', require('./routes/api'));
 app.use('/docs', require('./routes/docs'));
+// 403 Error
+app.use('/public/*', (req, res) => {
+    res.status(403).render('errors/403', { user: req.user || undefined });
+});
+// 404 Error
+app.use((req, res) => {
+    res.status(404).render('errors/404', { user: req.user || undefined });
+});
 
 app.listen(process.env.PORT || 5000);

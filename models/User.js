@@ -33,6 +33,23 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true
+    },
+    avatarImage: {
+        type: Buffer,
+        required: false
+    },
+    avatarImageType: {
+        type: String,
+        required: false
+    },
+});
+
+userSchema.virtual('avatarImagePath').get(function() {
+    if (this.avatarImage != null && this.avatarImageType != null) {
+        return `data:${this.avatarImageType};charset=utf-8;base64,${this.avatarImage.toString('base64')}`;
+    }
+    else {
+        return null;
     }
 });
 

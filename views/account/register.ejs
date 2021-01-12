@@ -5,9 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - Perid</title>
     <link rel="shortcut icon" href="../assets/PeridIcon.svg" type="image/x-icon">
+    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+    <!-- Fontawasome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../css/main.css">    
+    <!-- Filepond -->
+    <link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet">
+    <!-- Custom -->
+    <link rel="stylesheet" href="../css/main.css">
 </head>
 <body>
     <div class="container">
@@ -16,6 +21,10 @@
         <div class="wraper">
             <form id="create-pid-form" action="/account/register" method="POST">
                 <%- include('../partials/form-messages') %>
+                <div class="mb-2">
+                    <label for="InputAvatar" class="form-label">User Avatar</label>
+                    <input type="file" name="avatar" id="InputAvatar" class="filepond" aria-describedby="mAvatarHelp">
+                </div>
                 <div class="mb-2">
                     <label for="InputFName" class="form-label">First Name (*)</label>
                     <input type="text" class="form-control" id="InputFName" name="firstName" placeholder="Enter First Name"
@@ -63,6 +72,15 @@
         </div>
     </div>
 </body>
+<!-- Bootstrap -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
+<!-- Filepond -->
+<script src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.js"></script>
+<script src="https://unpkg.com/filepond-plugin-file-validate-size/dist/filepond-plugin-file-validate-size.js"></script>
+<script src="https://unpkg.com/filepond-plugin-file-encode/dist/filepond-plugin-file-encode.js"></script>
+<script src="https://unpkg.com/filepond-plugin-image-resize/dist/filepond-plugin-image-resize.js"></script>
+<script src="https://unpkg.com/filepond/dist/filepond.js"></script>
+<!-- Custom -->
+<script src="/js/file-upload.js"></script>
 </html>

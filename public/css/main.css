@@ -1,11 +1,21 @@
+/* Global */
 body {
     background-color: hsl(0, 0%, 15%);
+    margin-bottom: 15px;
 }
 
 fieldset {
     padding: 10px 15px;
     border: 3.5px solid #343a40;
     border-radius: 5px;
+}
+
+.alert-success fieldset {
+    border: 3.5px solid #0f5132;
+}
+
+.alert-warning fieldset {
+    border: 3.5px solid #664d2f;
 }
 
 fieldset legend {
@@ -19,15 +29,24 @@ div.spacer {
     padding: 10px;
 }
 
+/* Content Container */
 .container {
     background-color: whitesmoke;
     padding: 0;
+    border-radius: 0 0 5px 5px;
+}
+
+@media only screen and(min-width: 575px) {
+    .container {
+        border-radius: 0;
+    }
 }
 
 .container .wraper {
     padding: 15px;
 }
 
+/* Nav Bar */
 nav a.navbar-brand img {
     width: 32px;
     transform: translateY(-3px);
@@ -43,13 +62,15 @@ nav div.navbar-collapse .seperator {
     background-color: white !important;
 }
 
+/* Message Container */
 .message-container div.alert {
     margin-bottom: 0;
     margin-top: 10px;
 }
 
+/* Code Container */
 .code-container {
-    padding: 5px 10px;
-    border: 2px dashed hsl(0, 0%, 70%);
+    background-color: #171717;
+    padding: 7px 14px;
     border-radius: 5px;
 }

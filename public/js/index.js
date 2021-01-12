@@ -17,11 +17,29 @@ document.addEventListener('DOMContentLoaded', () => {
             showMessage('warning', result.message);
         }
         else {
-            showMessage('success',
-            `<b>Full Name</b> ${result.Id.firstName} ${result.Id.middleName} ${result.Id.lastName}<br>
-            <b>Birthdate</b> ${new Date(result.Id.birthdate).toDateString()}<br>
-            <b>Email</b> <a href="mailto:${result.Id.email}">${result.Id.email}</a><br>
-            <b>Phone</b> <a href="tel:${result.Id.phone}">${result.Id.phone}</a>`);
+            let userPanel = `
+            <fieldset>
+            <legend>${result.Id.firstName} ${result.Id.middleName} ${result.Id.lastName}</legend>`;
+
+            if (result.Id.avatarImageBase64 !== null) {
+                userPanel += `
+                <div class="avatar-wraper">
+                    <img class="user-avatar" src="${result.Id.avatarImageBase64}">
+                </div>
+                `;
+            }
+
+            userPanel += `
+            <div class="user-info-wraper">
+                <b>Full Name</b> ${result.Id.firstName} ${result.Id.middleName} ${result.Id.lastName}<br>
+                <b>Birthdate</b> ${new Date(result.Id.birthdate).toDateString()}<br>
+                <b>Email</b> <a href="mailto:${result.Id.email}">${result.Id.email}</a><br>
+                <b>Phone</b> <a href="tel:${result.Id.phone}">${result.Id.phone}</a>
+            </div>
+            </fieldset>
+            `;
+
+            showMessage('success', userPanel);
         }
     });
 });

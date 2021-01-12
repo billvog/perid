@@ -4,10 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>API - Perid</title>
-    <link rel="shortcut icon" href="../assets/PeridIcon.svg" type="image/x-icon">
+    <link rel="shortcut icon" href="/assets/PeridIcon.svg" type="image/x-icon">
+    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+    <!-- Fontawesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../css/main.css">
+    <!-- Custom -->
+    <link rel="stylesheet" href="/css/main.css">
 </head>
 <body>
     <div class="container">
@@ -42,24 +45,31 @@
                     <div class="code-container" style="margin-top: 10px;">
                         <code>
                             {<br>
-                                &emsp;error: false,<br>
-                                &emsp;foundId: true,<br>
-                                &emsp;Id: {<br>
-                                &emsp;&emsp;firstName: "John",<br>
-                                &emsp;&emsp;middleName: "",<br>
-                                &emsp;&emsp;lastName: "Smith",<br>
-                                &emsp;&emsp;birthdate: "2001-05-28T00:00:00.000+00:00",<br>
-                                &emsp;&emsp;phone: "202-555-0104",<br>
-                                &emsp;&emsp;email: "jhon.smith@outlook.com"<br>
+                                &emsp;"error": false,<br>
+                                &emsp;"foundId": true,<br>
+                                &emsp;"Id": {<br>
+                                &emsp;&emsp;"firstName": "John",<br>
+                                &emsp;&emsp;"middleName": "",<br>
+                                &emsp;&emsp;"lastName": "Smith",<br>
+                                &emsp;&emsp;"birthdate": "2001-05-28T00:00:00.000+00:00",<br>
+                                &emsp;&emsp;"phone": "202-555-0104",<br>
+                                &emsp;&emsp;"email": "jhon.smith@outlook.com",<br>
+                                &emsp;&emsp;"avatarImageBase64": "data:image/jpeg;charset=utf-8;base64,[avatar-base64-encoded]"<br>
                                 &emsp;}<br>
                             }
                         </code>
                     </div>
+                    <br>
+                    <p>
+                        To display user's avatar with html img tag just but the <code>avatarImageBase64</code> value in src attribute. <br>
+                        If the found user doesn't have an avatar, <code>avatarImageBase64</code> will be empty.
+                    </p>
                 </p>
             </fieldset>
         </div>
     </div>
 </body>
+<!-- Bootstrap -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
 </html>
