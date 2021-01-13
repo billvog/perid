@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const passport = require('passport');
+const qrcode = require('qrcode');
 
 const { ensureAuthenticated, ensureNotAuthenticated } = require('../config/auth');
 
@@ -27,9 +28,14 @@ router.delete('/logout', ensureAuthenticated, (req, res) => {
 
 // My Account page
 router.get('/my-account', ensureAuthenticated, (req, res) => {
-    res.render('account/my-account', {
-        user: req.user,
-        query: req.query
+    qrcode.toDataURL(`https://perid.tk/pid/${req.user.id}`, (error, url) => {
+        if (error) console.log(error);
+        
+        res.render('account/my-account', {
+            user: req.user,
+            myUserQR: url || undefined,
+            query: req.query
+        });
     });
 });
 
@@ -244,7 +250,7 @@ function saveUserAvatar(user, avatarEncoded, callback) {
 
     try {
         const avatar = JSON.parse(avatarEncoded);
-        if (avatar.size >= 3145728) {
+        if (avatar.size >= 5242880) {
             return callback('Avatar file is too large');
         }
     

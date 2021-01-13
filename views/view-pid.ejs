@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <% if (typeof foundUser !== 'undefined') { %> 
+        <title><%= foundUser.firstName %> <%= foundUser.middleName %> <%= foundUser.lastName %> - Perid</title>
+    <% } else { %> 
+        <title>View Pid - Perid</title>
+    <% } %> 
+    <link rel="shortcut icon" href="/assets/PeridIcon.svg" type="image/x-icon">
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+    <!-- Fontawesom -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
+    <!-- Custom -->
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/user-preview.css">
+</head>
+<body>
+    <div class="container">
+        <%- include('./partials/header') %> 
+
+        <div class="wraper">
+            <%- include('./partials/form-messages') %> 
+            <% if (typeof foundUser !== 'undefined') { %>
+                <div class="alert alert-success">
+                    <fieldset>
+                        <legend><%= foundUser.firstName %> <%= foundUser.middleName %> <%= foundUser.lastName %></legend>
+                        <% if (foundUser.avatarImagePath !== null) { %> 
+                            <div class="avatar-wraper">
+                                <img class="user-avatar" src="<%= foundUser.avatarImagePath %>">
+                                <img class="user-qr" src="<%= foundUserQR %>">
+                            </div>
+                        <% } %> 
+                        <div class="user-info-wraper">
+                            <b>Full Name</b> <%= foundUser.firstName %> <%= foundUser.middleName %> <%= foundUser.lastName %><br>
+                            <b>Birthdate</b> <%= new Date(foundUser.birthdate).toDateString() %><br>
+                            <b>Email</b> <a href="mailto:<%= foundUser.email %>"><%= foundUser.email %></a><br>
+                            <b>Phone</b> <a href="tel:<%= foundUser.phone %>"><%= foundUser.phone %></a>
+                        </div>
+                    </fieldset>
+                </div>
+            <% } %> 
+            <button class="btn btn-primary" onclick="window.history.go(-1)">Go Back</button>
+        </div>
+    </div>
+</body>
+<!-- Bootstrap -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
+</html>

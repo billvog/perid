@@ -10,6 +10,10 @@ fieldset {
     border-radius: 5px;
 }
 
+.alert:last-child {
+    margin-bottom: 0;
+}
+
 .alert-success fieldset {
     border: 3.5px solid #0f5132;
 }

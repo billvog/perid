@@ -13,6 +13,7 @@ const app = express();
 // Passport config
 require('./config/passport')(passport);
 
+// Connect to DB
 var MongoDbUri;
 if (process.env.NODE_ENV === "production") {
     MongoDbUri = process.env.DB_URI;
@@ -21,7 +22,6 @@ else {
     MongoDbUri = process.env.LOCAL_DB_URI;
 }
 
-console.log(`Connected to ${MongoDbUri}`);
 mongoose.connect(MongoDbUri, {
     useNewUrlParser: true,
     useUnifiedTopology: true
@@ -31,6 +31,8 @@ const database = mongoose.connection;
 database.on('error', (error) => console.log(error));
 
 app.set('view engine', 'ejs');
+
+// Express Middleware
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(express.json());
 app.use(express.urlencoded({ limit: '10mb', extended: false }));
