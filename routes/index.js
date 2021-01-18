@@ -20,13 +20,13 @@ router.get('/pid/:id', async (req, res) => {
         });
     }
 
-    qrcode.toDataURL(`https://perid.tk/pid/${user.id}`, (error, url) => {
+    qrcode.toDataURL(`https://perid.tk/pid/${user.id}`, async (error, url) => {
         if (error) console.log(error);
         
         res.render('view-pid', {
             user: req.user || undefined,
             foundUser: user,
-            foundUserQR: url || undefined
+            foundUserQrImage: await user.qrImagePath
         });
     });
 });

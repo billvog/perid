@@ -2,8 +2,6 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const passport = require('passport');
-const qrcode = require('qrcode');
-
 const { ensureAuthenticated, ensureNotAuthenticated } = require('../config/auth');
 
 // User model
@@ -27,15 +25,11 @@ router.delete('/logout', ensureAuthenticated, (req, res) => {
 });
 
 // My Account page
-router.get('/my-account', ensureAuthenticated, (req, res) => {
-    qrcode.toDataURL(`https://perid.tk/pid/${req.user.id}`, (error, url) => {
-        if (error) console.log(error);
-        
-        res.render('account/my-account', {
-            user: req.user,
-            myUserQR: url || undefined,
-            query: req.query
-        });
+router.get('/my-account', ensureAuthenticated, async (req, res) => {
+    res.render('account/my-account', {
+        user: req.user,
+        userQrImage: await req.user.qrImagePath,
+        query: req.query
     });
 });
 
@@ -62,7 +56,14 @@ router.post('/login', (req, res, next) => {
 
 // Handle register
 router.post('/register', async (req, res) => {
-    const { avatar, firstName, middleName, lastName, birthdate, phone, email, password, passwordConfirm } = req.body;
+    const {
+        firstName, middleName, lastName,
+        birthdate,
+        phone, homePhone, workPhone,
+        email,
+        password,
+        passwordConfirm
+    } = req.body;
     let errors = [];
 
     // Check for empty fields
@@ -75,84 +76,72 @@ router.post('/register', async (req, res) => {
         errors.push({ message: 'Password must be at least 6 characters' });
     }
 
+    // Check if passwords match
     if (password !== passwordConfirm) {
         errors.push({ message: 'Passwords do not match' });
     }
     
+    // Check if email is registered
+    const userWithThisEmail = await User.findOne({ email: email })
+    if (userWithThisEmail) {
+        errors.push({ message: 'This email is already registered' });
+    }
+
     if (errors.length > 0) {
         return res.render('account/register', {
             errors,
-            firstName,
-            middleName,
-            lastName,
+            // Input Fields
+            firstName, middleName, lastName,
             birthdate: birthdate || undefined,
-            phone,
+            phone, homePhone, workPhone,
             email
         });
     }
 
-    // Check if email is registered
-    User.findOne({ email }).then(user => {
-        if (user) {
-            errors.push({ message: 'This email is already registered' });
+    const newUser = new User({
+        firstName, middleName, lastName,
+        birthdate,
+        phone, homePhone, workPhone,
+        email,
+        password
+    });
+
+    // Set Avatar
+    const avatar = req.body.avatar;
+    saveUserAvatar(newUser, avatar, (error) => {
+        if (error) {
+            errors.push({ message: error });
             return res.render('account/register', {
+                query: { edit: '' },
                 errors,
-                firstName,
-                middleName,
-                lastName,
-                birthdate,
-                phone,
+                // Input Fields
+                firstName, middleName, lastName,
+                birthdate: birthdate || undefined,
+                phone, homePhone, workPhone,
                 email
             });
         }
+    });
 
-        const newUser = new User({
-            firstName,
-            middleName,
-            lastName,
-            birthdate,
-            phone,
-            email,
-            password
-        });
-
-        // Set Avatar
-        saveUserAvatar(newUser, avatar, (error) => {
-            if (error) {
-                errors.push({ message: error });
-                return res.render('account/register', {
-                    query: { edit: '' },
-                    errors,
-                    firstName,
-                    middleName,
-                    lastName,
-                    birthdate: birthdate || undefined,
-                    phone,
-                    email
-                });
-            }
-        });
+    // Set password
+    bcrypt.genSalt(10, (error, salt) => {
+        bcrypt.hash(password, salt, (error, hash) => {
+            if (error) throw error;
+            newUser.password = hash;
     
-        // Set password
-        bcrypt.genSalt(10, (error, salt) => {
-            bcrypt.hash(password, salt, (error, hash) => {
-                if (error) throw error;
-                newUser.password = hash;
-        
-                // Save user
-                newUser.save()
-                .then(() => {
-                    // Login
-                    req.login(newUser, (error) => {
-                        if (error) throw error;
+            // Save user
+            newUser.save()
+            .then(() => {
+                // Login
+                req.login(newUser, (error) => {
+                    if (error) throw error;
 
-                        req.flash('success_msg', 'Your account has been registered');
-                        return res.redirect('/account/my-account');
-                    });
-                })
-                .catch((error) => {
-                    console.log(error);
+                    req.flash('success_msg', 'Your account has been registered');
+                    return res.redirect('/account/my-account');
                 });
+            })
+            .catch((error) => {
+                console.log(error);
             });
         });
     });
@@ -160,7 +149,13 @@ router.post('/register', async (req, res) => {
 
 // Handle edit
 router.post('/edit', async (req, res) => {
-    const { firstName, middleName, lastName, birthdate, phone, email, passwordConfirm } = req.body;
+    const {
+        firstName, middleName, lastName,
+        birthdate,
+        phone, homePhone, workPhone,
+        email,
+        passwordConfirm
+    } = req.body;
     let errors = [];
 
     // Check for empty fields
@@ -174,74 +169,62 @@ router.post('/edit', async (req, res) => {
         errors.push({ message: 'Password is incorrect' });
     }
 
+    // Check if email is registered
+    const userWithThisEmail = await User.findOne({ email: email })
+    if (userWithThisEmail && userWithThisEmail.id != req.user.id) {
+        errors.push({ message: 'This email is already registered' });
+    }
+
     if (errors.length > 0) {
         return res.render('account/my-account', {
             user: req.user,
             query: { edit: '' },
             errors,
-            firstName,
-            middleName,
-            lastName,
+            // Input Fields
+            firstName, middleName, lastName,
             birthdate: birthdate || undefined,
-            phone,
+            phone, homePhone, workPhone,
             email
         });
     }
 
-    // Check if email is registered
-    User.findOne({ email: email }).then(user => {
-        if (user && user.id != req.user.id) {
-            errors.push({ message: 'This email is already registered' });
-            return res.render('account/my-account', {
-                user: req.user,
-                query: { edit: '' },
-                errors,
-                firstName,
-                middleName,
-                lastName,
-                birthdate: birthdate || undefined,
-                phone,
-                email
-            });
-        }
+    req.user.firstName = firstName;
+    req.user.middleName = middleName;
+    req.user.lastName = lastName;
+    req.user.birthdate = birthdate;
+    req.user.phone = phone;
+    req.user.homePhone = homePhone;
+    req.user.workPhone = workPhone;
+    req.user.email = email;
 
-        req.user.firstName = firstName;
-        req.user.middleName = middleName;
-        req.user.lastName = lastName;
-        req.user.birthdate = birthdate;
-        req.user.phone = phone;
-        req.user.email = email;
-
-        // Update Avatar
-        if (typeof req.body.avatar !== 'undefined') {
-            const avatar = req.body.avatar;
-            saveUserAvatar(req.user, avatar, (error) => {
-                if (error) {
-                    errors.push({ message: error });
-                    return res.render('account/my-account', {
-                        user: req.user,
-                        query: { edit: '' },
-                        errors,
-                        firstName,
-                        middleName,
-                        lastName,
-                        birthdate: birthdate || undefined,
-                        phone,
-                        email
-                    });
-                }
-            });
-        }
-    
-        // Save modified user
-        req.user.save()
-        .then((user) => {
-            req.flash('success_msg', 'Your account has been modified');
-            res.redirect('/account/my-account');
-        })
-        .catch((error) => {
-            console.log(error);
+    // Update Avatar
+    if (typeof req.body.avatar !== 'undefined') {
+        const avatar = req.body.avatar;
+        saveUserAvatar(req.user, avatar, (error) => {
+            if (error) {
+                errors.push({ message: error });
+                return res.render('account/my-account', {
+                    user: req.user,
+                    query: { edit: '' },
+                    errors,
+                    // Input Fields
+                    firstName, middleName, lastName,
+                    birthdate: birthdate || undefined,
+                    phone, homePhone, workPhone,
+                    email
+                });
+            }
         });
+    }
+
+    // Save modified user
+    req.user.save()
+    .then(() => {
+        req.flash('success_msg', 'Your account has been modified');
+        res.redirect('/account/my-account');
+    })
+    .catch((error) => {
+        console.log(error);
     });
 });
 

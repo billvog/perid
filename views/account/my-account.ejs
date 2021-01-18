@@ -13,6 +13,7 @@
     <link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet">
     <!-- Custom -->
     <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/user-form.css">
     <link rel="stylesheet" href="/css/user-preview.css">
 </head>
 <body>
@@ -33,9 +34,10 @@
                                 </button>
                             </div>
                         <% } %> 
-                        <div class="remove-avatar"
+                        <div class="choose-avatar"
                         <% if (user.avatarImagePath !== null) { %> style='display:none' <% } %>>
-                            <input type="file" name="avatar" id="InputAvatar" style="display:none"
+                            <input type="file" <% if (user.avatarImagePath === null) { %> name='avatar' <% } %>
+                            id="InputAvatar" style="display:none"
                             class="filepond" aria-describedby="mAvatarHelp">
                         </div>
                     </div>
@@ -60,10 +62,26 @@
                         <input type="date" class="form-control" id="InputBDate" name="birthdate"
                         value="<%= typeof birthdate != 'undefined' ? new Date(birthdate).toISOString().split('T')[0] : new Date(user.birthdate).toISOString().split('T')[0] %>">
                     </div>
-                    <div class="mb-2">
-                        <label for="InputPhone" class="form-label">Phone (*)</label>
-                        <input type="tel" class="form-control" id="InputPhone" name="phone" placeholder="Enter Phone"
-                        value="<%= typeof phone != 'undefined' ? phone : user.phone %>">
+                    <!-- Phone Group -->
+                    <div class="row phone-numbers-group">
+                        <!-- Phone -->
+                        <div class="col-sm mb-2">
+                            <label for="InputPhone" class="form-label">Phone (*)</label>
+                            <input type="tel" class="form-control" id="InputPhone" name="phone" placeholder="Enter Phone"
+                            value="<%= typeof phone != 'undefined' ? phone : user.phone %>">
+                        </div>
+                        <!-- Home Phone -->
+                        <div class="col-sm mb-2">
+                            <label for="InputHomePhone" class="form-label">Home Phone</label>
+                            <input type="tel" class="form-control" id="InputHomePhone" name="homePhone" placeholder="Enter Home Phone"
+                            value="<%= typeof homePhone != 'undefined' ? homePhone : user.homePhone %>">
+                        </div>
+                        <!-- Work Phone -->
+                        <div class="col-sm mb-2">
+                            <label for="InputWorkPhone" class="form-label">Work Phone</label>
+                            <input type="tel" class="form-control" id="InputWorkPhone" name="workPhone" placeholder="Enter Work Phone"
+                            value="<%= typeof workPhone != 'undefined' ? workPhone : user.workPhone %>">
+                        </div>
                     </div>
                     <div class="mb-2">
                         <label for="InputEmail" class="form-label">Email (*)</label>
@@ -102,22 +120,37 @@
                 <%- include('../partials/form-messages') %> 
                 <fieldset>
                     <legend>
-                        <a href="?edit" title='Edit'><i class="fas fa-user-edit"></i></a> 
+                        <a href="?edit" title='Edit My Account'><i class="fas fa-user-edit"></i></a> 
                         Account Information
                     </legend>
-
                     <span>
-                        <% if (user.avatarImagePath !== null) { %>
-                            <div class="avatar-wraper">
+                        <div class="avatar-wraper">
+                            <% if (user.avatarImagePath !== null) { %>
                                 <img class="user-avatar" src="<%= user.avatarImagePath %>">
-                                <img class="user-qr" src="<%= myUserQR %>">
-                            </div>
-                        <% } %> 
+                            <% } %> 
+                            <% if (userQrImage !== null) { %>
+                                <img class="user-qr" src="<%= userQrImage %>">
+                            <% } else { %> 
+                                <img class="user-qr" src="/assets/NoQrAvailable.png"
+                                title="The was a problem generating the Qr Code" alt="No Qr Code Available">
+                            <% } %> 
+                        </div>
                         <div class="user-info-wraper">
                             <b>ID</b> <%= user.id %><br>
                             <b>Full Name</b> <%= user.firstName %> <%= user.middleName %> <%= user.lastName %><br>
-                            <b>Birthdate</b> <%= new Date(user.birthdate).toDateString() %><br>
-                            <b>Phone</b> <a href="tel:<%= user.phone %>"><%= user.phone %></a><br>
+                            <b>Birthdate</b> <%= new Date(user.birthdate).toLocaleString().split(',')[0] %><br>
+                            <div class="phone-numbers-group">
+                                <!-- Phone -->
+                                <b>Phone</b> <a href="tel:<%= user.phone %>"><%= user.phone %></a><br>
+                                <% if (user.homePhone !== null && user.homePhone !== '') { %> 
+                                    <!-- Home Phone -->
+                                    <b>Home Phone</b> <a href="tel:<%= user.homePhone %>"><%= user.homePhone %></a><br>
+                                <% } %> 
+                                <% if (user.workPhone !== null && user.workPhone !== '') { %> 
+                                    <!-- Work Phone -->
+                                    <b>Work Phone</b> <a href="tel:<%= user.workPhone %>"><%= user.workPhone %></a><br>
+                                <% } %> 
+                            </div>
                             <b>Email</b> <a href="mailto:<%= user.email %>"><%= user.email %></a>
                         </div>
                     </span>
@@ -142,19 +175,18 @@
     var removeAvatarModal;
 
     $(document).ready(() => {
-        $('#InputAvatar input').attr('name', '');
         $('#InputAvatar').show();
-
+        // Initialize remove avatar confirm modal
         removeAvatarModal = new bootstrap.Modal(document.getElementById('removeAvatarModal'));
     });
     
     function RemoveAvatar() {
-        // Hide Confirm Modal
+        // Hide confirm modal
         removeAvatarModal.hide();
 
-        $('.remove-avatar').show();
+        $('.choose-avatar').show();
+        $('.choose-avatar input').attr('name', 'avatar');
         $('.remove-avatar-btn').hide();
-        $('#InputAvatar input').attr('name', 'avatar');
     }
 </script>
 <% } %> 

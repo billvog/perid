@@ -1,6 +1,6 @@
 {
   "name": "perid",
-  "version": "1.0.0",
+  "version": "1.0.01",
   "description": "A Personal Id for everyone",
   "main": "app.js",
   "scripts": {

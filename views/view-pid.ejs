@@ -27,17 +27,34 @@
                 <div class="alert alert-success">
                     <fieldset>
                         <legend><%= foundUser.firstName %> <%= foundUser.middleName %> <%= foundUser.lastName %></legend>
-                        <% if (foundUser.avatarImagePath !== null) { %> 
-                            <div class="avatar-wraper">
+                        <div class="avatar-wraper">
+                            <% if (foundUser.avatarImagePath !== null) { %>
                                 <img class="user-avatar" src="<%= foundUser.avatarImagePath %>">
-                                <img class="user-qr" src="<%= foundUserQR %>">
-                            </div>
-                        <% } %> 
+                            <% } %> 
+                            <% if (foundUserQrImage !== null) { %>
+                                <img class="user-qr" src="<%= foundUserQrImage %>">
+                            <% } else { %> 
+                                <img class="user-qr" src="/assets/NoQrAvailable.png"
+                                title="The was a problem generating the Qr Code" alt="No Qr Code Available">
+                            <% } %> 
+                        </div>
                         <div class="user-info-wraper">
+                            <b>ID</b> <%= foundUser.id %><br>
                             <b>Full Name</b> <%= foundUser.firstName %> <%= foundUser.middleName %> <%= foundUser.lastName %><br>
-                            <b>Birthdate</b> <%= new Date(foundUser.birthdate).toDateString() %><br>
-                            <b>Email</b> <a href="mailto:<%= foundUser.email %>"><%= foundUser.email %></a><br>
-                            <b>Phone</b> <a href="tel:<%= foundUser.phone %>"><%= foundUser.phone %></a>
+                            <b>Birthdate</b> <%= new Date(foundUser.birthdate).toLocaleString().split(',')[0] %><br>
+                            <div class="phone-numbers-group">
+                                <!-- Phone -->
+                                <b>Phone</b> <a href="tel:<%= foundUser.phone %>"><%= foundUser.phone %></a><br>
+                                <% if (foundUser.homePhone !== null && foundUser.homePhone !== '') { %> 
+                                    <!-- Home Phone -->
+                                    <b>Home Phone</b> <a href="tel:<%= foundUser.homePhone %>"><%= foundUser.homePhone %></a><br>
+                                <% } %> 
+                                <% if (foundUser.workPhone !== null && foundUser.workPhone !== '') { %> 
+                                    <!-- Work Phone -->
+                                    <b>Work Phone</b> <a href="tel:<%= foundUser.workPhone %>"><%= foundUser.workPhone %></a><br>
+                                <% } %> 
+                            </div>
+                            <b>Email</b> <a href="mailto:<%= foundUser.email %>"><%= foundUser.email %></a>
                         </div>
                     </fieldset>
                 </div>

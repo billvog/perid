@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const { nanoid } = require('nanoid');
+const qrcode = require('qrcode');
 
 const userSchema = new mongoose.Schema({
     _id: {
@@ -26,6 +27,14 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    homePhone: {
+        type: String,
+        required: false
+    },
+    workPhone: {
+        type: String,
+        required: false
+    },
     email: {
         type: String,
         required: true
@@ -49,6 +58,16 @@ userSchema.virtual('avatarImagePath').get(function() {
         return `data:${this.avatarImageType};charset=utf-8;base64,${this.avatarImage.toString('base64')}`;
     }
     else {
+        return null;
+    }
+});
+
+userSchema.virtual('qrImagePath').get(async function() {
+    try {
+        return await qrcode.toDataURL(`https://perid.tk/pid/${this._id}`);
+    }
+    catch (error) {
+        console.log(error);
         return null;
     }
 });

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - Perid</title>
-    <link rel="shortcut icon" href="../assets/PeridIcon.svg" type="image/x-icon">
+    <link rel="shortcut icon" href="/assets/PeridIcon.svg" type="image/x-icon">
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
     <!-- Fontawasome -->
@@ -12,7 +12,8 @@
     <!-- Filepond -->
     <link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet">
     <!-- Custom -->
-    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/user-form.css">
 </head>
 <body>
     <div class="container">
@@ -46,10 +47,26 @@
                     <input type="date" class="form-control" id="InputBDate" name="birthdate"
                     value="<%= typeof birthdate != 'undefined' ? new Date(birthdate).toISOString().split('T')[0] : '' %>">
                 </div>
-                <div class="mb-2">
-                    <label for="InputPhone" class="form-label">Phone (*)</label>
-                    <input type="tel" class="form-control" id="InputPhone" name="phone" placeholder="Enter Phone"
-                    value="<%= typeof phone != 'undefined' ? phone : '' %>">
+                <!-- Phone Group -->
+                <div class="row phone-numbers-group">
+                    <!-- Phone -->
+                    <div class="col-sm mb-2">
+                        <label for="InputPhone" class="form-label">Phone (*)</label>
+                        <input type="tel" class="form-control" id="InputPhone" name="phone" placeholder="Enter Phone"
+                        value="<%= typeof phone != 'undefined' ? phone : '' %>">
+                    </div>
+                    <!-- Home Phone -->
+                    <div class="col-sm mb-2">
+                        <label for="InputHomePhone" class="form-label">Home Phone</label>
+                        <input type="tel" class="form-control" id="InputHomePhone" name="homePhone" placeholder="Enter Home Phone"
+                        value="<%= typeof homePhone != 'undefined' ? homePhone : '' %>">
+                    </div>
+                    <!-- Work Phone -->
+                    <div class="col-sm mb-2">
+                        <label for="InputWorkPhone" class="form-label">Work Phone</label>
+                        <input type="tel" class="form-control" id="InputWorkPhone" name="workPhone" placeholder="Enter Work Phone"
+                        value="<%= typeof workPhone != 'undefined' ? workPhone : '' %>">
+                    </div>
                 </div>
                 <div class="mb-2">
                     <label for="InputEMail" class="form-label">Email (*)</label>

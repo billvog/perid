@@ -35,7 +35,7 @@ app.set('view engine', 'ejs');
 // Express Middleware
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(express.json());
-app.use(express.urlencoded({ limit: '10mb', extended: false }));
+app.use(express.urlencoded({ limit: '5mb', extended: false }));
 app.use(methodOverride('_m'));
 app.use(flash());
 app.use(session({
@@ -68,4 +68,7 @@ app.use((req, res) => {
     res.status(404).render('errors/404', { user: req.user || undefined });
 });
 
-app.listen(process.env.PORT || 5000);
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+    console.log(`Starting at port: ${PORT}`);
+});
