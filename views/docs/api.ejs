@@ -55,14 +55,15 @@
                                 &emsp;&emsp;"phone": "202-555-0104",<br>
                                 &emsp;&emsp;"email": "jhon.smith@outlook.com",<br>
                                 &emsp;&emsp;"avatarImageBase64": "data:image/jpeg;charset=utf-8;base64,[avatar-base64-encoded]"<br>
+                                &emsp;&emsp;"qrImageBase64": "data:image/png;charset=utf-8;base64,[qr-base64-encoded]"<br>
                                 &emsp;}<br>
                             }
                         </code>
                     </div>
                     <br>
                     <p>
-                        To display user's avatar with html img tag just but the <code>avatarImageBase64</code> value in src attribute. <br>
-                        If the found user doesn't have an avatar, <code>avatarImageBase64</code> will be empty.
+                        To display user's avatar (or user's qr code) with html img tag just but the <code>avatarImageBase64 (or qrImageBase64)</code> value in src attribute. <br>
+                        If the found user doesn't have an avatar, <code>avatarImageBase64</code> will be null.  If user's qr code fail to generate it will be null as well.
                     </p>
                 </p>
             </fieldset>

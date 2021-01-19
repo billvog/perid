@@ -26,7 +26,8 @@ router.get('/:id', async (req, res) => {
                 birthdate: user.birthdate,
                 phone: user.phone,
                 email: user.email,
-                avatarImageBase64: user.avatarImagePath
+                avatarImageBase64: user.avatarImagePath,
+                qrImageBase64: await user.qrImagePath
             }
         });
     }
