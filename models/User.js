@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const { nanoid } = require('nanoid');
 const qrcode = require('qrcode');
+var url = require('url');
 
 const userSchema = new mongoose.Schema({
     _id: {
@@ -64,7 +65,7 @@ userSchema.virtual('avatarImagePath').get(function() {
 
 userSchema.virtual('qrImagePath').get(async function() {
     try {
-        return await qrcode.toDataURL(`https://perid.tk/pid/${this._id}`);
+        return await qrcode.toDataURL(`https://perid.ddns.net/pid/${this._id}`);
     }
     catch (error) {
         console.log(error);
