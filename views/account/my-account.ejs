@@ -22,7 +22,7 @@
 
         <div class="wraper">
             <% if (query.edit != undefined) { %>
-                <form action="/account/edit" method="POST">
+                <form id="edit-account-form" action="/account/edit" method="POST">
                     <%- include('../partials/form-messages') %> 
                     <div class="mb-2">
                         <label for="InputAvatar" class="form-label">User Avatar</label>
@@ -37,7 +37,7 @@
                         <% } %> 
                         <div class="choose-avatar"
                         <% if (user.avatarImagePath !== null) { %> style='display:none' <% } %>>
-                            <input type="file" <% if (user.avatarImagePath === null) { %> name='avatar' <% } %>
+                            <input type="file" name='avatar'
                             id="InputAvatar" style="display:none"
                             class="filepond" aria-describedby="mAvatarHelp">
                         </div>
@@ -171,12 +171,13 @@
 <script src="https://unpkg.com/filepond/dist/filepond.js"></script>
 <!-- Custom -->
 <script src="/js/file-upload.js"></script>
-<% if (user.avatarImagePath !== null) { %> 
+<% if (query.edit != undefined && user.avatarImagePath !== null) { %> 
 <script>
     var removeAvatarModal;
 
     $(document).ready(() => {
         $('#InputAvatar').show();
+        $('.choose-avatar input').attr('name', '');
         // Initialize remove avatar confirm modal
         removeAvatarModal = new bootstrap.Modal(document.getElementById('removeAvatarModal'));
     });
