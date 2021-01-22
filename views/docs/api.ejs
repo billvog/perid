@@ -33,7 +33,7 @@
                     Perid also provides an API that you can use in your app to find a user registered is our databases. <br>
                     The usage of it is fairly simple;
                     <h5>> Get user by Id</h5>
-                    Getting a user by Id requires a GET request to <code>https://perid.tk/api/[pid]</code></p>
+                    Getting a user by Id requires a GET request @ <code>https://perid.tk/api/[pid]</code></p>
                     <p>
                         The API returns a json object that contains: <br>
                         An <code>error</code> boolean, if true there was an error if not request operated successfully. <br>
@@ -64,6 +64,14 @@
                     <p>
                         To display user's avatar (or user's qr code) with html img tag just but the <code>avatarImageBase64 (or qrImageBase64)</code> value in src attribute. <br>
                         If the found user doesn't have an avatar, <code>avatarImageBase64</code> will be null.  If user's qr code fail to generate it will be null as well.
+                    </p>
+
+                    <h5>> Get user Avatar or Qr</h5>
+                    If you want to get users avatar or qr make a GET request @ <code>https://perid.tk/api/[pid]/avatar</code> or <code>https://perid.tk/api/[pid]/qr</code></p>
+                    <p>
+                        In this case API returns an image buffer (if succeed).<br>
+                        If the API fails, for some reason to retrieve the image from the server, it will return an <code>500 Internal Server</code> error. <br>
+                        If the provided Id doesn't match to any in the database then it will respond with a <code>404 Not Found</code> error. <br>
                     </p>
                 </p>
             </fieldset>

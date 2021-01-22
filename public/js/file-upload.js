@@ -8,8 +8,9 @@ FilePond.registerPlugin(
 FilePond.setOptions({
     imageResizeTargetWidth: 32,
     imageResizeTargetHeight: 32,
+    imageResizeMode: 'force',
+    acceptedFileTypes: ['image/*'],
     maxFileSize: "5MB",
-    acceptedFileTypes: ['image/*']
 });
 
 FilePond.parse(document.body);

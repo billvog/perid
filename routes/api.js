@@ -1,5 +1,7 @@
+const fs = require('fs');
 const express = require('express');
 const router = express.Router();
+const qrcode = require('qrcode');
 
 // User model
 const User = require('../models/User');
@@ -36,6 +38,40 @@ router.get('/:id', async (req, res) => {
             error: true,
             message: error.message
         });
+    }
+});
+
+// Get avatar
+router.get('/:id/avatar', async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
+        if (user == null) {
+            return res.sendStatus(404);
+        }
+
+        res.type(user.avatarImageType);
+        res.send(user.avatarImage);
+    }
+    catch (error) {
+        res.sendStatus(500);
+    }
+});
+
+// Get QrCode
+router.get('/:id/qr', async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
+        if (user == null) {
+            return res.sendStatus(404);
+        }
+
+        res.type('image/png');
+        res.send(await qrcode.toBuffer(`https://perid.tk/pid/${user.id}`));
+    }
+    catch (error) {
+        res.status(500);
+        res.type('image/png');
+        res.send(fs.readFileSync('public/assets/NoQrAvailable.png'));
     }
 });
 
