@@ -5,8 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <% if (typeof foundUser !== 'undefined') { %> 
         <title><%= foundUser.firstName %> <%= foundUser.middleName %> <%= foundUser.lastName %> - Perid</title>
+        <meta name="description" content="<%= foundUser.firstName %>'s Virtual Personal Id">
     <% } else { %> 
         <title>View Pid - Perid</title>
+        <meta name="description" content="Inspect Virtual Personal Id">
     <% } %> 
     <link rel="shortcut icon" href="/assets/PeridIcon.svg" type="image/x-icon">
     <!-- Bootstrap -->
