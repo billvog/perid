@@ -37,7 +37,7 @@
                     Getting a user by Id requires a GET request @ <code>https://perid.tk/api/[pid]</code></p>
                     <p>
                         The API returns a json object that contains: <br>
-                        An <code>error</code> boolean, if true there was an error if not request operated successfully. <br>
+                        An <code>error</code> boolean, if true, there was an error, if not, request operated successfully. <br>
                         If there was an error the api returns a <code>message</code> string that contains a message explaining the error. <br>
                         If there was no error the api returns a boolean <code>foundId</code> that specifies if the given id is registered to a user. <br>
                         If a user is found then the api returns an object <code>Id</code> that contains the found user.
@@ -54,21 +54,14 @@
                                 &emsp;&emsp;"lastName": "Smith",<br>
                                 &emsp;&emsp;"birthdate": "2001-05-28T00:00:00.000+00:00",<br>
                                 &emsp;&emsp;"phone": "202-555-0104",<br>
-                                &emsp;&emsp;"email": "jhon.smith@outlook.com",<br>
-                                &emsp;&emsp;"avatarImageBase64": "data:image/jpeg;charset=utf-8;base64,[avatar-base64-encoded]"<br>
-                                &emsp;&emsp;"qrImageBase64": "data:image/png;charset=utf-8;base64,[qr-base64-encoded]"<br>
+                                &emsp;&emsp;"email": "jhon.smith@outlook.com"<br>
                                 &emsp;}<br>
                             }
                         </code>
                     </div>
                     <br>
-                    <p>
-                        To display user's avatar (or user's qr code) with html img tag just but the <code>avatarImageBase64 (or qrImageBase64)</code> value in src attribute. <br>
-                        If the found user doesn't have an avatar, <code>avatarImageBase64</code> will be null.  If user's qr code fail to generate it will be null as well.
-                    </p>
-
                     <h5>> Get user Avatar or Qr</h5>
-                    If you want to get users avatar or qr make a GET request @ <code>https://perid.tk/api/[pid]/avatar</code> or <code>https://perid.tk/api/[pid]/qr</code></p>
+                    If you want to get user's avatar or qr make a GET request @ <code>https://perid.tk/api/[pid]/avatar</code> or <code>https://perid.tk/api/[pid]/qr</code></p>
                     <p>
                         In this case API returns an image buffer (if succeed).<br>
                         If the API fails, for some reason to retrieve the image from the server, it will return an <code>500 Internal Server</code> error. <br>
