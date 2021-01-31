@@ -1,8 +1,7 @@
 form div.phone-numbers-group {
-    background: slategrey;
-    color: white;
     border: 0;
-    border-radius: 5px;
+    border-left: 3px solid #ffc108;
+    border-right: 3px solid #ffc108;
     padding: 8px 0;
     margin: 13px 0;
 }

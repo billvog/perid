@@ -6,6 +6,7 @@ const { ensureAuthenticated, ensureNotAuthenticated } = require('../config/auth'
 
 // User model
 const User = require('../models/User');
+const Session = require('../models/Session');
 
 // Register page
 router.get('/register', ensureNotAuthenticated, (req, res) => {
@@ -18,8 +19,14 @@ router.get('/login', ensureNotAuthenticated, (req, res) => {
 });
 
 // Logout page
-router.delete('/logout', ensureAuthenticated, (req, res) => {
+router.delete('/logout', ensureAuthenticated, async (req, res) => {
+    // Delete session
+    await Session.deleteOne({ sessionId: req.cookies.sessid });
+    res.cookie('sessid', '', { maxAge: 0 });
+
+    // Logout user
     req.logout();
+
     req.flash('success_msg', 'You are logged out');
     res.redirect('/account/login');
 });
@@ -47,9 +54,25 @@ router.post('/login', (req, res, next) => {
             });
         }
 
-        req.login(user, (error) => {
+        req.login(user, async (error) => {
             if (error) return next(error);
-            return res.redirect('/account/my-account');
+
+            // Create new session
+            const newSession = new Session({
+                userId: req.user.id
+            });
+
+            try {
+                await newSession.save();
+                res.cookie('sessid', newSession.sessionId, {
+                    maxAge: 2592000000 // 30 days
+                });
+
+                return res.redirect('/account/my-account');
+            }
+            catch (e) {
+                throw e;
+            }
         });
     })(req, res, next);
 });
@@ -71,19 +94,30 @@ router.post('/register', async (req, res) => {
         errors.push({ message: 'Please fill all the required fields' });
     }
 
+    // Validate phones
+    const phoneRegexVal = '^[+]?[0-9]+$';
+    if (!phone.match(phoneRegexVal)) {
+        errors.push({ message: 'Phone number is invalid' });
+    }
+    if (homePhone && !homePhone.match(phoneRegexVal)) {
+        errors.push({ message: 'Home phone is invalid' });
+    }
+    if (workPhone && !workPhone.match(phoneRegexVal)) {
+        errors.push({ message: 'Work phone is invalid' });
+    }
+
     // Validate password
     if (password.length < 6) {
         errors.push({ message: 'Password must be at least 6 characters' });
     }
 
     // Check if passwords match
-    if (password !== passwordConfirm) {
+    if (password && passwordConfirm && password !== passwordConfirm) {
         errors.push({ message: 'Passwords do not match' });
     }
     
     // Check if email is registered
-    const userWithThisEmail = await User.findOne({ email: email })
-    if (userWithThisEmail) {
+    if (await User.findOne({ email: email }) != null) {
         errors.push({ message: 'This email is already registered' });
     }
 
@@ -161,6 +195,18 @@ router.post('/edit', async (req, res) => {
     // Check for empty fields
     if (!firstName || !lastName || !birthdate || !phone || !email || !passwordConfirm) {
         errors.push({ message: 'Please fill all the required fields' });
+    }
+
+    // Validate phones
+    const phoneRegexVal = '^[+]?[0-9]+$';
+    if (!phone.match(phoneRegexVal)) {
+        errors.push({ message: 'Phone number is invalid' });
+    }
+    if (homePhone && !homePhone.match(phoneRegexVal)) {
+        errors.push({ message: 'Home phone is invalid' });
+    }
+    if (workPhone && !workPhone.match(phoneRegexVal)) {
+        errors.push({ message: 'Work phone is invalid' });
     }
 
     // Match password

@@ -13,15 +13,15 @@ router.get('/:id', async (req, res) => {
         if (user == null) {
             return res.status(404).json({
                 error: false,
-                foundId: false,
-                message: "User with that Id doesn't exist"
+                foundID: false,
+                message: "User with that ID doesn't exist"
             });
         }
         
         res.json({
             error: false,
-            foundId: true,
-            Id: {
+            foundID: true,
+            ID: {
                 firstName: user.firstName,
                 middleName: user.middleName,
                 lastName: user.lastName,

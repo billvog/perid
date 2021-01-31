@@ -4,9 +4,6 @@ const path = require('path');
 const express = require('express');
 const mongoose = require('mongoose');
 const passport = require('passport');
-const session = require('express-session');
-const flash = require('express-flash');
-const methodOverride = require('method-override');
 
 const app = express();
 
@@ -14,15 +11,7 @@ const app = express();
 require('./config/passport')(passport);
 
 // Connect to DB
-var MongoDbUri;
-if (process.env.NODE_ENV === "production") {
-    MongoDbUri = process.env.DB_URI;
-}
-else {
-    MongoDbUri = process.env.LOCAL_DB_URI;
-}
-
-mongoose.connect(MongoDbUri, {
+mongoose.connect(process.env.DB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 });
@@ -32,19 +21,23 @@ database.on('error', (error) => console.log(error));
 
 app.set('view engine', 'ejs');
 
-// Express Middleware
+// Middleware
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(express.json());
 app.use(express.urlencoded({ limit: '5mb', extended: false }));
-app.use(methodOverride('_m'));
-app.use(flash());
-app.use(session({
+app.use(require('method-override')('_m'));
+app.use(require('express-flash')());
+app.use(require('cookie-parser')());
+app.use(require('express-session')({
     secret: process.env.SESSION_SECRET,
     resave: true,
     saveUninitialized: true
 }));
 app.use(passport.initialize());
 app.use(passport.session());
+
+// Session Manager Middleware
+app.use(require('./config/session-manager'));
 
 // Global Variables
 app.use((req, res, next) => {

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Account - Perid</title>
-    <meta name="description" content="View & Edit your Virtual Personal Id">
+    <meta name="description" content="View & Edit your Virtual Personal ID">
     <link rel="shortcut icon" href="/assets/PeridIcon.svg" type="image/x-icon">
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
@@ -27,7 +27,7 @@
                     <%- include('../partials/form-messages') %> 
                     <div class="mb-2">
                         <label for="InputAvatar" class="form-label">User Avatar</label>
-                        <% if (user.avatarImagePath !== null) { %> 
+                        <% if (user.avatarImagePath != null) { %> 
                             <div class="mb-3 remove-avatar-btn">
                                 <button class="btn btn-danger" type="button"
                                 title="Remove user avatar..."
@@ -37,10 +37,9 @@
                             </div>
                         <% } %> 
                         <div class="choose-avatar"
-                        <% if (user.avatarImagePath !== null) { %> style='display:none' <% } %>>
+                        <% if (user.avatarImagePath != null) { %> style='display:none' <% } %>>
                             <input type="file" name='avatar'
-                            id="InputAvatar" style="display:none"
-                            class="filepond" aria-describedby="mAvatarHelp">
+                            id="InputAvatar" class="filepond" aria-describedby="mAvatarHelp">
                         </div>
                     </div>
                     <div class="mb-2">
@@ -172,23 +171,32 @@
 <script src="https://unpkg.com/filepond/dist/filepond.js"></script>
 <!-- Custom -->
 <script src="/js/file-upload.js"></script>
-<% if (query.edit != undefined && user.avatarImagePath !== null) { %> 
+<% if (query.edit != undefined && user.avatarImagePath != null) { %> 
 <script>
+    let avatarIsRemoved = false;
+    // Modal
     var removeAvatarModal;
 
     $(document).ready(() => {
         $('#InputAvatar').show();
-        $('.choose-avatar input').attr('name', '');
+
         // Initialize remove avatar confirm modal
         removeAvatarModal = new bootstrap.Modal(document.getElementById('removeAvatarModal'));
+
+        $('form#edit-account-form').on('submit', (e) => {
+            if (!avatarIsRemoved) {
+                $('.choose-avatar input').attr('name', 'blank');
+            }
+        });
     });
     
     function RemoveAvatar() {
+        avatarIsRemoved = true;
+
         // Hide confirm modal
         removeAvatarModal.hide();
 
         $('.choose-avatar').show();
-        $('.choose-avatar input').attr('name', 'avatar');
         $('.remove-avatar-btn').hide();
     }
 </script>
