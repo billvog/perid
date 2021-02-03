@@ -47,14 +47,6 @@
                             <div class="phone-numbers-group">
                                 <!-- Phone -->
                                 <b>Phone</b> <a href="tel:<%= foundUser.phone %>"><%= foundUser.phone %></a><br>
-                                <% if (foundUser.homePhone !== null && foundUser.homePhone !== '') { %> 
-                                    <!-- Home Phone -->
-                                    <b>Home Phone</b> <a href="tel:<%= foundUser.homePhone %>"><%= foundUser.homePhone %></a><br>
-                                <% } %> 
-                                <% if (foundUser.workPhone !== null && foundUser.workPhone !== '') { %> 
-                                    <!-- Work Phone -->
-                                    <b>Work Phone</b> <a href="tel:<%= foundUser.workPhone %>"><%= foundUser.workPhone %></a><br>
-                                <% } %> 
                             </div>
                             <b>Email</b> <a href="mailto:<%= foundUser.email %>"><%= foundUser.email %></a>
                         </div>

@@ -1,7 +1,6 @@
 form div.phone-numbers-group {
     border: 0;
-    border-left: 3px solid #ffc108;
-    border-right: 3px solid #ffc108;
+    border-left: 4px solid #ffc108;
     padding: 8px 0;
     margin: 13px 0;
 }

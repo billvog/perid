@@ -71,18 +71,6 @@
                             <input type="tel" class="form-control" id="InputPhone" name="phone" placeholder="Enter Phone"
                             value="<%= typeof phone != 'undefined' ? phone : user.phone %>">
                         </div>
-                        <!-- Home Phone -->
-                        <div class="col-sm mb-2">
-                            <label for="InputHomePhone" class="form-label">Home Phone</label>
-                            <input type="tel" class="form-control" id="InputHomePhone" name="homePhone" placeholder="Enter Home Phone"
-                            value="<%= typeof homePhone != 'undefined' ? homePhone : user.homePhone %>">
-                        </div>
-                        <!-- Work Phone -->
-                        <div class="col-sm mb-2">
-                            <label for="InputWorkPhone" class="form-label">Work Phone</label>
-                            <input type="tel" class="form-control" id="InputWorkPhone" name="workPhone" placeholder="Enter Work Phone"
-                            value="<%= typeof workPhone != 'undefined' ? workPhone : user.workPhone %>">
-                        </div>
                     </div>
                     <div class="mb-2">
                         <label for="InputEmail" class="form-label">Email (*)</label>
@@ -143,14 +131,6 @@
                             <div class="phone-numbers-group">
                                 <!-- Phone -->
                                 <b>Phone</b> <a href="tel:<%= user.phone %>"><%= user.phone %></a><br>
-                                <% if (user.homePhone !== null && user.homePhone !== '') { %> 
-                                    <!-- Home Phone -->
-                                    <b>Home Phone</b> <a href="tel:<%= user.homePhone %>"><%= user.homePhone %></a><br>
-                                <% } %> 
-                                <% if (user.workPhone !== null && user.workPhone !== '') { %> 
-                                    <!-- Work Phone -->
-                                    <b>Work Phone</b> <a href="tel:<%= user.workPhone %>"><%= user.workPhone %></a><br>
-                                <% } %> 
                             </div>
                             <b>Email</b> <a href="mailto:<%= user.email %>"><%= user.email %></a>
                         </div>

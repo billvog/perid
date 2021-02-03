@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 
-router.get('/api', async (req, res) => {
-    res.render('docs/api', {
+router.get('/', async (req, res) => {
+    res.render('docs/index', {
         user: req.user || undefined
     });
 });

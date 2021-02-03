@@ -26,10 +26,6 @@
     display: block;
 }
 
-.user-info-wraper b {
-    color: #212529;
-}
-
 .user-info-wraper div.phone-numbers-group {
     border-left: 3px solid #8CC63F;
     padding: 4px 8px;

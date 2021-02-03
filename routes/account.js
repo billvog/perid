@@ -82,7 +82,7 @@ router.post('/register', async (req, res) => {
     const {
         firstName, middleName, lastName,
         birthdate,
-        phone, homePhone, workPhone,
+        phone,
         email,
         password,
         passwordConfirm
@@ -95,15 +95,8 @@ router.post('/register', async (req, res) => {
     }
 
     // Validate phones
-    const phoneRegexVal = '^[+]?[0-9]+$';
-    if (!phone.match(phoneRegexVal)) {
+    if (!phone.match('^[+]?[0-9]+$')) {
         errors.push({ message: 'Phone number is invalid' });
-    }
-    if (homePhone && !homePhone.match(phoneRegexVal)) {
-        errors.push({ message: 'Home phone is invalid' });
-    }
-    if (workPhone && !workPhone.match(phoneRegexVal)) {
-        errors.push({ message: 'Work phone is invalid' });
     }
 
     // Validate password
@@ -127,7 +120,7 @@ router.post('/register', async (req, res) => {
             // Input Fields
             firstName, middleName, lastName,
             birthdate: birthdate || undefined,
-            phone, homePhone, workPhone,
+            phone,
             email
         });
     }
@@ -135,7 +128,7 @@ router.post('/register', async (req, res) => {
     const newUser = new User({
         firstName, middleName, lastName,
         birthdate,
-        phone, homePhone, workPhone,
+        phone,
         email,
         password
     });
@@ -151,7 +144,7 @@ router.post('/register', async (req, res) => {
                 // Input Fields
                 firstName, middleName, lastName,
                 birthdate: birthdate || undefined,
-                phone, homePhone, workPhone,
+                phone,
                 email
             });
         }
@@ -186,7 +179,7 @@ router.post('/edit', async (req, res) => {
     const {
         firstName, middleName, lastName,
         birthdate,
-        phone, homePhone, workPhone,
+        phone,
         email,
         passwordConfirm
     } = req.body;
@@ -198,15 +191,8 @@ router.post('/edit', async (req, res) => {
     }
 
     // Validate phones
-    const phoneRegexVal = '^[+]?[0-9]+$';
-    if (!phone.match(phoneRegexVal)) {
+    if (!phone.match('^[+]?[0-9]+$')) {
         errors.push({ message: 'Phone number is invalid' });
-    }
-    if (homePhone && !homePhone.match(phoneRegexVal)) {
-        errors.push({ message: 'Home phone is invalid' });
-    }
-    if (workPhone && !workPhone.match(phoneRegexVal)) {
-        errors.push({ message: 'Work phone is invalid' });
     }
 
     // Match password
@@ -229,7 +215,7 @@ router.post('/edit', async (req, res) => {
             // Input Fields
             firstName, middleName, lastName,
             birthdate: birthdate || undefined,
-            phone, homePhone, workPhone,
+            phone,
             email
         });
     }
@@ -239,8 +225,6 @@ router.post('/edit', async (req, res) => {
     req.user.lastName = lastName;
     req.user.birthdate = birthdate;
     req.user.phone = phone;
-    req.user.homePhone = homePhone;
-    req.user.workPhone = workPhone;
     req.user.email = email;
 
     // Update Avatar
@@ -256,7 +240,7 @@ router.post('/edit', async (req, res) => {
                     // Input Fields
                     firstName, middleName, lastName,
                     birthdate: birthdate || undefined,
-                    phone, homePhone, workPhone,
+                    phone,
                     email
                 });
             }

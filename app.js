@@ -61,7 +61,7 @@ app.use((req, res) => {
     res.status(404).render('errors/404', { user: req.user || undefined });
 });
 
-const PORT = process.env.PORT || 5000;
+const PORT = 5000;
 app.listen(PORT, () => {
     console.log(`Starting at port: ${PORT}`);
 });
