@@ -13,7 +13,7 @@ router.get('/', async (req, res) => {
 
 router.get('/pid/:id', async (req, res) => {
     const user = await User.findById(req.params.id);
-    if (user == null) {
+    if (user == null || !user.verified) {
         return res.render('view-pid', {
             user: req.user || undefined,
             error: "User with that ID doesn't exist"

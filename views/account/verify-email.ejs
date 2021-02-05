@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>403 Error - Perid</title>
+    <title>Verify Account - Perid</title>
+    <meta name="description" content="View & Edit your Virtual Personal ID">
     <link rel="shortcut icon" href="/assets/PeridIcon.svg" type="image/x-icon">
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
@@ -11,19 +12,28 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
     <!-- Custom -->
     <link rel="stylesheet" href="/css/main.css">
-    <link rel="stylesheet" href="/css/user-preview.css">
+    <link rel="stylesheet" href="/css/user-form.css">
 </head>
 <body>
     <div class="container">
         <%- include('../partials/header') %> 
 
         <div class="wraper">
-            <div class="alert alert-warning" role="alert"
-            style="margin-bottom:0">
-                <h4>Error 403 - Forbidden</h4>
-                You cannot access this location. You've been redirected somewhere safe. <br>
-                <a href="/" class="alert-link">Go Back Home</a>
-            </div>
+            <form id="email-verification-account-form" action="/account/send-email-verification" method="POST">
+                <%- include('../partials/form-messages') %> 
+                <div class="mb-3">
+                    <p>
+                        Without verifying your email your account doesn't show up on search. 
+                        Also, if you don't verify it after 30 days, your account gets permanently deleted. <br>
+                        This happens to prevent spam with fake email accounts.
+                    </p>
+                    <hr>
+                    <p>
+                        Send email verification to <b><%= user.email %></b>
+                    </p>
+                </div>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-envelope"></i> Send</button>
+            </form>
         </div>
     </div>
 </body>

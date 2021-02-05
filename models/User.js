@@ -35,6 +35,11 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    verified: {
+        type: Boolean,
+        required: true,
+        default: false
+    },
     avatarImage: {
         type: Buffer,
         required: false
@@ -43,6 +48,12 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: false
     },
+    createdAt: {
+        type: Date,
+        default: Date.now,
+        require: true,
+        index: true
+    }
 });
 
 userSchema.virtual('avatarImagePath').get(function() {

@@ -10,7 +10,7 @@ const User = require('../models/User');
 router.get('/:id', async (req, res) => {
     try {
         const user = await User.findById(req.params.id);
-        if (user == null) {
+        if (user == null || !user.verified) {
             return res.status(404).json({
                 error: false,
                 foundID: false,
@@ -43,7 +43,7 @@ router.get('/:id', async (req, res) => {
 router.get('/:id/avatar', async (req, res) => {
     try {
         const user = await User.findById(req.params.id);
-        if (user == null) {
+        if (user == null || !user.verified) {
             return res.sendStatus(404);
         }
 
@@ -59,7 +59,7 @@ router.get('/:id/avatar', async (req, res) => {
 router.get('/:id/qr', async (req, res) => {
     try {
         const user = await User.findById(req.params.id);
-        if (user == null) {
+        if (user == null || !user.verified) {
             return res.sendStatus(404);
         }
 

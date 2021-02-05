@@ -2,26 +2,35 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const passport = require('passport');
-const { ensureAuthenticated, ensureNotAuthenticated } = require('../config/auth');
+const auth = require('../config/auth');
+const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
 
 // User model
 const User = require('../models/User');
-const Session = require('../models/Session');
+
+// Nodemailer
+var transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: 'main.perid.tk@gmail.com',
+        pass: 'nush-zaben=basiles-bogiatzhs'
+    }
+});
 
 // Register page
-router.get('/register', ensureNotAuthenticated, (req, res) => {
+router.get('/register', auth.ensureNotAuthenticated, (req, res) => {
     res.render('account/register');
 });
 
 // Login page
-router.get('/login', ensureNotAuthenticated, (req, res) => {
+router.get('/login', auth.ensureNotAuthenticated, (req, res) => {
     res.render('account/login');
 });
 
 // Logout page
-router.delete('/logout', ensureAuthenticated, async (req, res) => {
+router.delete('/logout', auth.ensureAuthenticated, async (req, res) => {
     // Delete session
-    await Session.deleteOne({ sessionId: req.cookies.sessid });
     res.cookie('sessid', '', { maxAge: 0 });
 
     // Logout user
@@ -32,7 +41,7 @@ router.delete('/logout', ensureAuthenticated, async (req, res) => {
 });
 
 // My Account page
-router.get('/my-account', ensureAuthenticated, async (req, res) => {
+router.get('/my-account', auth.ensureAuthenticated, async (req, res) => {
     res.render('account/my-account', {
         user: req.user,
         userQrImage: await req.user.qrImagePath,
@@ -40,8 +49,15 @@ router.get('/my-account', ensureAuthenticated, async (req, res) => {
     });
 });
 
+// Verify email page
+router.get('/verify-email', auth.ensureAuthenticated, auth.ensureNotVerified, (req, res) => {
+    res.render('account/verify-email', {
+        user: req.user
+    });
+});
+
 // Handle login
-router.post('/login', (req, res, next) => {
+router.post('/login', auth.ensureNotAuthenticated, (req, res, next) => {
     const { email } = req.body;
 
     passport.authenticate('local', (error, user, info) => {
@@ -58,27 +74,66 @@ router.post('/login', (req, res, next) => {
             if (error) return next(error);
 
             // Create new session
-            const newSession = new Session({
-                userId: req.user.id
-            });
+            jwt.sign({
+                user: req.user.id
+            }, process.env.JWT_SECRET, {
+                expiresIn: '30d'
+            }, (error, sessid) => {
+                if (error) throw error;
 
-            try {
-                await newSession.save();
-                res.cookie('sessid', newSession.sessionId, {
+                // Save token in cookie
+                res.cookie('sessid', sessid, {
                     maxAge: 2592000000 // 30 days
                 });
 
                 return res.redirect('/account/my-account');
-            }
-            catch (e) {
-                throw e;
-            }
+            });
         });
     })(req, res, next);
 });
 
+// Handle email verification
+router.post('/send-email-verification', auth.ensureAuthenticated, auth.ensureNotVerified, (req, res) => {
+    sendEmailVerification(req.user, (error, info) => {
+        if (error) {
+            res.render('account/verify-email', {
+                user: req.user,
+                errors: [{ message: error.message }]
+            });
+        }
+        else {
+            res.render('account/verify-email', {
+                user: req.user,
+                success_msg: "Verification email has been sent"
+            });
+        }
+    });
+});
+
+router.get('/verify/:token', auth.ensureNotVerified, async (req, res) => {
+    try {
+        const { user: id } = jwt.verify(req.params.token, process.env.JWT_SECRET);
+        await User.findOneAndUpdate({ _id: id }, {
+            verified: true
+        });
+    }
+    catch (error) {
+        if (error.name == 'TokenExpiredError') {
+            return res.render('account/verify-email', {
+                user: req.user || undefined,
+                errors: [{ message: "This token has been expired" }]
+            });
+        }
+
+        console.log(error);
+    }
+
+    req.flash('success_msg', 'Your account has been verified');
+    res.redirect('/account/my-account');
+});
+
 // Handle register
-router.post('/register', async (req, res) => {
+router.post('/register', auth.ensureNotAuthenticated, async (req, res) => {
     const {
         firstName, middleName, lastName,
         birthdate,
@@ -150,43 +205,43 @@ router.post('/register', async (req, res) => {
         }
     });
 
-    // Set password
-    bcrypt.genSalt(10, (error, salt) => {
-        bcrypt.hash(password, salt, (error, hash) => {
-            if (error) throw error;
-            newUser.password = hash;
-    
-            // Save user
-            newUser.save()
-            .then(() => {
-                // Login
-                req.login(newUser, (error) => {
-                    if (error) throw error;
+    // Send email verification
+    sendEmailVerification(newUser);
 
-                    req.flash('success_msg', 'Your account has been registered');
-                    return res.redirect('/account/my-account');
-                });
-            })
-            .catch((error) => {
-                console.log(error);
+    // Set password
+    bcrypt.hash(password, 10, (error, hash) => {
+        if (error) throw error;
+        newUser.password = hash;
+
+        // Save user
+        newUser.save()
+        .then(() => {
+            // Login
+            req.login(newUser, (error) => {
+                if (error) throw error;
+
+                req.flash('success_msg', 'Your account has been registered');
+                return res.redirect('/account/my-account');
             });
+        })
+        .catch((error) => {
+            console.log(error);
         });
     });
 });
 
 // Handle edit
-router.post('/edit', async (req, res) => {
+router.post('/edit', auth.ensureAuthenticated, async (req, res) => {
     const {
         firstName, middleName, lastName,
         birthdate,
         phone,
-        email,
         passwordConfirm
     } = req.body;
     let errors = [];
 
     // Check for empty fields
-    if (!firstName || !lastName || !birthdate || !phone || !email || !passwordConfirm) {
+    if (!firstName || !lastName || !birthdate || !phone || !passwordConfirm) {
         errors.push({ message: 'Please fill all the required fields' });
     }
 
@@ -201,12 +256,6 @@ router.post('/edit', async (req, res) => {
         errors.push({ message: 'Password is incorrect' });
     }
 
-    // Check if email is registered
-    const userWithThisEmail = await User.findOne({ email: email })
-    if (userWithThisEmail && userWithThisEmail.id != req.user.id) {
-        errors.push({ message: 'This email is already registered' });
-    }
-
     if (errors.length > 0) {
         return res.render('account/my-account', {
             user: req.user,
@@ -215,8 +264,7 @@ router.post('/edit', async (req, res) => {
             // Input Fields
             firstName, middleName, lastName,
             birthdate: birthdate || undefined,
-            phone,
-            email
+            phone
         });
     }
 
@@ -225,7 +273,6 @@ router.post('/edit', async (req, res) => {
     req.user.lastName = lastName;
     req.user.birthdate = birthdate;
     req.user.phone = phone;
-    req.user.email = email;
 
     // Update Avatar
     if (typeof req.body.avatar !== 'undefined') {
@@ -240,8 +287,7 @@ router.post('/edit', async (req, res) => {
                     // Input Fields
                     firstName, middleName, lastName,
                     birthdate: birthdate || undefined,
-                    phone,
-                    email
+                    phone
                 });
             }
         });
@@ -286,6 +332,39 @@ function saveUserAvatar(user, avatarEncoded, callback) {
     }
     
     callback(null);
+}
+
+function sendEmailVerification(user, callback) {
+    jwt.sign({
+        user: user.id
+    }, process.env.JWT_SECRET, {
+        expiresIn: '10m'
+    }, (error, token) => {
+        if (error) return callback(error);
+
+        const url = `http://localhost:5000/account/verify/${token}`;
+        
+        transporter.sendMail({
+            from: 'Perid.tk <main.perid.tk@gmail.com>',
+            to: user.email,
+            subject: 'Email verification from Perid.tk',
+            html: `
+            <div style='font-family:Arial,Helvetica,sans-serif !important; padding:15px 20px; border-radius:5px; background-color:#212529; color:#C3C4C5 !important;'>
+            <h2>Verify your email address for Perid.tk</h2>
+            <p>Click <a target='_blank' href="${url}" style='color:gold;'>here</a> to verify your email address or click the following link:<br>
+            <a target='_blank' href="${url}" style='color:goldenrod;'>${url}</a></p>
+            <p>This email has been sent by a no-reply email account. Any reply will be ignored.</p>
+            </div>
+            `
+        }, (error, info) => {
+            if (error) {
+                callback(error);
+            }
+            else {
+                callback(null, info);
+            }
+        });
+    });
 }
 
 module.exports = router;

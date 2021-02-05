@@ -8,7 +8,7 @@
     <link rel="shortcut icon" href="/assets/PeridIcon.svg" type="image/x-icon">
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
-    <!-- Fontawesom -->
+    <!-- Fontawesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
     <!-- Filepond -->
     <link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet">
@@ -72,11 +72,6 @@
                             value="<%= typeof phone != 'undefined' ? phone : user.phone %>">
                         </div>
                     </div>
-                    <div class="mb-2">
-                        <label for="InputEmail" class="form-label">Email (*)</label>
-                        <input type="email" class="form-control" id="InputEmail" name="email" placeholder="Enter Email"
-                        value="<%= typeof email != 'undefined' ? email : user.email %>">
-                    </div>
                     <div class="mb-3">
                         <label for="InputPasswordConfirm" class="form-label">Confirm Password (*)</label>
                         <input type="password" class="form-control" id="InputPasswordConfirm" name="passwordConfirm" placeholder="Confirm Password" required>
@@ -113,6 +108,13 @@
                         Account Information
                     </legend>
                     <span>
+                        <% if (!user.verified) { %> 
+                            <div class="mb-3">
+                                <a href="/account/verify-email" class="btn btn-dark" title="Account verification is required">
+                                    Verify your account
+                                </a>
+                            </div>
+                        <% } %> 
                         <div class="avatar-wraper">
                             <% if (user.avatarImagePath !== null) { %>
                                 <img class="user-avatar" src="<%= user.avatarImagePath %>">
