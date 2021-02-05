@@ -20,7 +20,9 @@
 
         <div class="wraper">
             <form id="email-verification-account-form" action="/account/send-email-verification" method="POST">
-                <%- include('../partials/form-messages') %> 
+                <% if (typeof query == 'undefined') { %> 
+                    <%- include('../partials/form-messages') %> 
+                <% } %> 
                 <div class="mb-3">
                     <p>
                         Without verifying your email your account doesn't show up on search. 
@@ -29,15 +31,47 @@
                     </p>
                     <hr>
                     <p>
-                        Send email verification to <b><%= user.email %></b>
+                        Send email verification to <b><%= user.email %></b> <br>
+                        Wrong email? <a href="#" data-bs-toggle="modal" data-bs-target="#changeEmailModal">Change it</a>
                     </p>
                 </div>
                 <button type="submit" class="btn btn-primary"><i class="fas fa-envelope"></i> Send</button>
             </form>
+        </div>
+        <!-- Change Email Modal -->
+        <div class="modal fade" id="changeEmailModal" tabindex="-1" aria-labelledby="changeEmailModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="changeEmailModalLabel">Confirm</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <%- include('../partials/form-messages.ejs') %> 
+                    <form action="/account/edit/email" method="POST">
+                        <div class="mb-3">
+                            <label for="emailInput" class="form-label">Email address</label>
+                            <input type="email" class="form-control" id="emailInput" name="email"
+                            value="<%= typeof email != 'undefined' ? email : user.email %>">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Change</button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+                </div>
+            </div>
         </div>
     </div>
 </body>
 <!-- Bootstrap -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
+<% if (typeof query != 'undefined' && query.prompt == 'change-email') { %> 
+    <script>
+        var ChangeMailModal = new bootstrap.Modal(document.getElementById('changeEmailModal'));
+        ChangeMailModal.show();
+    </script>
+<% } %> 
 </html>

@@ -230,6 +230,50 @@ router.post('/register', auth.ensureNotAuthenticated, async (req, res) => {
     });
 });
 
+// Handle email editing while not verified (in case of miss-typed email)
+router.post('/edit/email', auth.ensureAuthenticated, auth.ensureNotVerified, async (req, res) => {
+    const {
+        email
+    } = req.body;
+    let errors = [];
+
+    // Check for empty fields
+    if (!email) {
+        errors.push({ message: 'Please fill a valid email adress' });
+    }
+
+    // Check if the same email is used
+    if (email == req.user.email) {
+        errors.push({ message: 'This email is already is use by you' });
+    }
+    // Check if email is registered
+    else if (await User.findOne({ email: email }) != null) {
+        errors.push({ message: 'This email is already registered' });
+    }
+
+    if (errors.length > 0) {
+        return res.render('account/verify-email', {
+            user: req.user,
+            query: { prompt: 'change-email' },
+            errors,
+            // Input Fields
+            email
+        });
+    }
+
+    req.user.email = email;
+
+    // Save modified user
+    req.user.save()
+    .then(() => {
+        req.flash('success_msg', 'Your email has been changed');
+        res.redirect('/account/verify-email');
+    })
+    .catch((error) => {
+        console.log(error);
+    });
+});
+
 // Handle edit
 router.post('/edit', auth.ensureAuthenticated, async (req, res) => {
     const {
