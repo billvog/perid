@@ -1,22 +1,24 @@
+const fs = require('fs');
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const passport = require('passport');
 const auth = require('../config/auth');
 const jwt = require('jsonwebtoken');
-const nodemailer = require('nodemailer');
+
+// Custom config
+const mailer = require('../config/nodemailer');
+const multer = require('../config/multer');
+const cloudinary = require('../config/cloudinary');
+
+// Avatar values
+const maxAvatarSize = 5000000;
+const allowedImageFormats = [
+    'image/jpeg', 'image/jpg', 'image/png'
+];
 
 // User model
 const User = require('../models/User');
-
-// Nodemailer
-var transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: 'main.perid.tk@gmail.com',
-        pass: 'nush-zaben=basiles-bogiatzhs'
-    }
-});
 
 // Register page
 router.get('/register', auth.ensureNotAuthenticated, (req, res) => {
@@ -133,7 +135,7 @@ router.get('/verify/:token', auth.ensureNotVerified, async (req, res) => {
 });
 
 // Handle register
-router.post('/register', auth.ensureNotAuthenticated, async (req, res) => {
+router.post('/register', auth.ensureNotAuthenticated, multer.single('avatar'), async (req, res) => {
     const {
         firstName, middleName, lastName,
         birthdate,
@@ -144,57 +146,49 @@ router.post('/register', auth.ensureNotAuthenticated, async (req, res) => {
     } = req.body;
     let errors = [];
 
-    // Check for empty fields
-    if (!firstName || !lastName || !birthdate || !phone || !email || !password || !passwordConfirm) {
-        errors.push({ message: 'Please fill all the required fields' });
-    }
+    try {
+        // Check for empty fields
+        if (!firstName || !lastName || !birthdate || !phone || !email || !password || !passwordConfirm) {
+            errors.push({ message: 'Please fill all the required fields' });
+        }
 
-    // Validate phones
-    if (!phone.match('^[+]?[0-9]+$')) {
-        errors.push({ message: 'Phone number is invalid' });
-    }
+        // Validate avatar
+        const avatar = req.file;
+        if (avatar) {
+            if (avatar.size > maxAvatarSize) {
+                errors.push({ message: 'Avatar is too big, 5MB is the maximum size' });
+            }
 
-    // Validate password
-    if (password.length < 6) {
-        errors.push({ message: 'Password must be at least 6 characters' });
-    }
+            if (!allowedImageFormats.includes(avatar.mimetype)) {
+                errors.push({ message: 'Disallowed avatar image format' });
+            }
+        }
 
-    // Check if passwords match
-    if (password && passwordConfirm && password !== passwordConfirm) {
-        errors.push({ message: 'Passwords do not match' });
-    }
-    
-    // Check if email is registered
-    if (await User.findOne({ email: email }) != null) {
-        errors.push({ message: 'This email is already registered' });
-    }
+        // Validate phones
+        if (!phone.match('^[+]?[0-9]+$')) {
+            errors.push({ message: 'Phone number is invalid' });
+        }
 
-    if (errors.length > 0) {
-        return res.render('account/register', {
-            errors,
-            // Input Fields
-            firstName, middleName, lastName,
-            birthdate: birthdate || undefined,
-            phone,
-            email
-        });
-    }
+        // Validate password
+        if (password.length < 6) {
+            errors.push({ message: 'Password must be at least 6 characters' });
+        }
 
-    const newUser = new User({
-        firstName, middleName, lastName,
-        birthdate,
-        phone,
-        email,
-        password
-    });
+        // Check if passwords match
+        if (password && passwordConfirm && password !== passwordConfirm) {
+            errors.push({ message: 'Passwords do not match' });
+        }
+        
+        // Check if email is registered
+        if (await User.findOne({ email: email }) != null) {
+            errors.push({ message: 'This email is already registered' });
+        }
 
-    // Set Avatar
-    const avatar = req.body.avatar;
-    saveUserAvatar(newUser, avatar, (error) => {
-        if (error) {
-            errors.push({ message: error });
+        if (errors.length > 0) {
+            // Remove uploaded image from temp
+            fs.rm(`tmp/user-avatars/${req.user.id}`, (err) => { if (err) throw err });
+
             return res.render('account/register', {
-                query: { edit: '' },
                 errors,
                 // Input Fields
                 firstName, middleName, lastName,
@@ -203,31 +197,59 @@ router.post('/register', auth.ensureNotAuthenticated, async (req, res) => {
                 email
             });
         }
-    });
 
-    // Send email verification
-    sendEmailVerification(newUser);
+        const NewUser = new User({
+            firstName, middleName, lastName,
+            birthdate,
+            phone,
+            email,
+            password
+        });
 
-    // Set password
-    bcrypt.hash(password, 10, (error, hash) => {
-        if (error) throw error;
-        newUser.password = hash;
-
-        // Save user
-        newUser.save()
-        .then(() => {
-            // Login
-            req.login(newUser, (error) => {
+        // Set Avatar
+        if (avatar && fs.existsSync(`tmp/user-avatars/${req.user.id}`)) {
+            // Upload to cloud
+            const uploadRes = await cloudinary.uploader.upload(`tmp/user-avatars/${req.user.id}`, {
+                resource_type: 'image',
+                public_id: `users/avatars/${req.user.id}`,
+                overwrite: true,
+                // Upload as 256x256
+                transformation: [{ width: 256, height: 256, gravity: 'face', crop: 'fill' }]
+            }, (error) => {
+                // Remove uploaded image from temp
+                fs.rm(`tmp/user-avatars/${req.user.id}`, (err) => { if (err) throw err });
                 if (error) throw error;
+            });
 
+            // Attach url to user
+            NewUser.avatarUrl = uploadRes.url;
+        }
+        else {
+            NewUser.avatarUrl = null;
+        }
+
+        // Send email verification
+        sendEmailVerification(NewUser);
+
+        // Set password
+        bcrypt.hash(password, 10, async (error, hash) => {
+            if (error) throw error;
+            NewUser.password = hash;
+
+            // Save user
+            await NewUser.save();
+
+            // Login
+            req.login(NewUser, (error) => {
+                if (error) throw error;
                 req.flash('success_msg', 'Your account has been registered');
                 return res.redirect('/account/my-account');
             });
-        })
-        .catch((error) => {
-            console.log(error);
         });
-    });
+    }
+    catch (error) {
+        
+    }
 });
 
 // Handle email editing while not verified (in case of miss-typed email)
@@ -275,7 +297,7 @@ router.post('/edit/email', auth.ensureAuthenticated, auth.ensureNotVerified, asy
 });
 
 // Handle edit
-router.post('/edit', auth.ensureAuthenticated, async (req, res) => {
+router.post('/edit', auth.ensureAuthenticated, multer.single('avatar'), async (req, res) => {
     const {
         firstName, middleName, lastName,
         birthdate,
@@ -284,99 +306,95 @@ router.post('/edit', auth.ensureAuthenticated, async (req, res) => {
     } = req.body;
     let errors = [];
 
-    // Check for empty fields
-    if (!firstName || !lastName || !birthdate || !phone || !passwordConfirm) {
-        errors.push({ message: 'Please fill all the required fields' });
-    }
+    try {
+        // Check for empty fields
+        if (!firstName || !lastName || !birthdate || !phone || !passwordConfirm) {
+            errors.push({ message: 'Please fill all the required fields' });
+        }
 
-    // Validate phones
-    if (!phone.match('^[+]?[0-9]+$')) {
-        errors.push({ message: 'Phone number is invalid' });
-    }
-
-    // Match password
-    const isPasswordCorrect = await bcrypt.compare(passwordConfirm, req.user.password);
-    if (!isPasswordCorrect) {
-        errors.push({ message: 'Password is incorrect' });
-    }
-
-    if (errors.length > 0) {
-        return res.render('account/my-account', {
-            user: req.user,
-            query: { edit: '' },
-            errors,
-            // Input Fields
-            firstName, middleName, lastName,
-            birthdate: birthdate || undefined,
-            phone
-        });
-    }
-
-    req.user.firstName = firstName;
-    req.user.middleName = middleName;
-    req.user.lastName = lastName;
-    req.user.birthdate = birthdate;
-    req.user.phone = phone;
-
-    // Update Avatar
-    if (typeof req.body.avatar !== 'undefined') {
-        const avatar = req.body.avatar;
-        saveUserAvatar(req.user, avatar, (error) => {
-            if (error) {
-                errors.push({ message: error });
-                return res.render('account/my-account', {
-                    user: req.user,
-                    query: { edit: '' },
-                    errors,
-                    // Input Fields
-                    firstName, middleName, lastName,
-                    birthdate: birthdate || undefined,
-                    phone
-                });
+        // Validate avatar
+        const avatar = req.file;
+        if (avatar) {
+            if (avatar.size > maxAvatarSize) {
+                errors.push({ message: 'Avatar is too big, 5MB is the maximum size' });
             }
-        });
-    }
+    
+            if (!allowedImageFormats.includes(avatar.mimetype)) {
+                errors.push({ message: 'Disallowed avatar image format' });
+            }
+        }
 
-    // Save modified user
-    req.user.save()
-    .then(() => {
+        // Validate phones
+        if (!phone.match('^[+]?[0-9]+$')) {
+            errors.push({ message: 'Phone number is invalid' });
+        }
+
+        // Match password
+        const isPasswordCorrect = await bcrypt.compare(passwordConfirm, req.user.password);
+        if (!isPasswordCorrect) {
+            errors.push({ message: 'Password is incorrect' });
+        }
+
+        if (errors.length > 0) {
+            // Remove uploaded image from temp
+            if (fs.existsSync(`tmp/user-avatars/${req.user.id}`)) {
+                fs.rm(`tmp/user-avatars/${req.user.id}`, (err) => { if (err) throw err });
+            }
+
+            return res.render('account/my-account', {
+                user: req.user,
+                query: { edit: '' },
+                errors,
+                // Input Fields
+                firstName, middleName, lastName,
+                birthdate: birthdate || undefined,
+                phone
+            });
+        }
+
+        // Update avatar
+        if (avatar && fs.existsSync(`tmp/user-avatars/${req.user.id}`)) {
+            // Upload to cloud
+            const uploadRes = await cloudinary.uploader.upload(`tmp/user-avatars/${req.user.id}`, {
+                resource_type: 'image',
+                public_id: `users/avatars/${req.user.id}`,
+                overwrite: true,
+                // Upload as 256x256
+                transformation: [{ width: 256, height: 256, gravity: 'face', crop: 'fill' }]
+            }, (error) => {
+                // Remove uploaded image from temp
+                fs.rm(`tmp/user-avatars/${req.user.id}`, (err) => { if (err) throw err });
+                if (error) throw error;
+            });
+
+            // Attach url to user
+            req.user.avatarUrl = uploadRes.url;
+        }
+        else if (req.body.remove_avatar == 'true') {
+            // Remove url from database
+            req.user.avatarUrl = null;
+            // Remove file from cloud
+            cloudinary.uploader.destroy(`users/avatars/${req.user.id}`, (error) => {
+                if (error) throw error;
+            });
+        }
+    
+        req.user.firstName = firstName;
+        req.user.middleName = middleName;
+        req.user.lastName = lastName;
+        req.user.birthdate = birthdate;
+        req.user.phone = phone;
+    
+        // Save modified user
+        await req.user.save();
+
         req.flash('success_msg', 'Your account has been modified');
         res.redirect('/account/my-account');
-    })
-    .catch((error) => {
-        console.log(error);
-    });
-});
-
-function saveUserAvatar(user, avatarEncoded, callback) {
-    if (avatarEncoded == null) return callback(null);
-
-    try {
-        const avatar = JSON.parse(avatarEncoded);
-        if (avatar.size >= 5242880) {
-            return callback('Avatar file is too large');
-        }
-    
-        const imageFileType = avatar.type.split('/')[0];
-        if (imageFileType != 'image') {
-            return callback(`Incorrect file format ${imageFileType}`);
-        }
-    
-        user.avatarImage = new Buffer.from(avatar.data, 'base64');
-        user.avatarImageType = avatar.type;
     }
     catch (error) {
-        if (error.name == 'SyntaxError') {
-            user.avatarImage = null;
-            user.avatarImageType = '';
-            return callback(null);
-        }
-        
-        return callback(error.message);
+        if (error) throw error;
     }
-    
-    callback(null);
-}
+});
 
 function sendEmailVerification(user, callback) {
     jwt.sign({
@@ -386,15 +404,18 @@ function sendEmailVerification(user, callback) {
     }, (error, token) => {
         if (error) return callback(error);
 
-        const url = `http://localhost:5000/account/verify/${token}`;
+        const url = `https://perid.tk/account/verify/${token}`;
         
-        transporter.sendMail({
+        mailer.sendMail({
             from: 'Perid.tk <main.perid.tk@gmail.com>',
             to: user.email,
             subject: 'Email verification from Perid.tk',
             html: `
             <div style='font-family:Arial,Helvetica,sans-serif !important; padding:15px 20px; border-radius:5px; background-color:#212529; color:#C3C4C5 !important;'>
             <h2>Verify your email address for Perid.tk</h2>
+            <p>Hey there ${user.firstName},</p>
+            <p>Your email has been recently used to create an account to <a target='_blank' href='https://perid.tk/'>Perid</a>.</p>
+            <p>If you don't verify your email address you won't be visible in search and your account will be deleted in 30 days from the registration date.</p>
             <p>Click <a target='_blank' href="${url}" style='color:gold;'>here</a> to verify your email address or click the following link:<br>
             <a target='_blank' href="${url}" style='color:goldenrod;'>${url}</a></p>
             <p>This email has been sent by a no-reply email account. Any reply will be ignored.</p>

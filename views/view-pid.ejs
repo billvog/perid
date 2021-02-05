@@ -30,8 +30,8 @@
                     <fieldset>
                         <legend><%= foundUser.firstName %> <%= foundUser.middleName %> <%= foundUser.lastName %></legend>
                         <div class="avatar-wraper">
-                            <% if (foundUser.avatarImagePath !== null) { %>
-                                <img class="user-avatar" src="<%= foundUser.avatarImagePath %>">
+                            <% if (foundUser.avatarUrl !== null) { %>
+                                <img class="user-avatar" src="<%= foundUser.avatarUrl %>">
                             <% } %> 
                             <% if (foundUserQrImage !== null) { %>
                                 <img class="user-qr" src="<%= foundUserQrImage %>">

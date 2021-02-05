@@ -40,11 +40,7 @@ const userSchema = new mongoose.Schema({
         required: true,
         default: false
     },
-    avatarImage: {
-        type: Buffer,
-        required: false
-    },
-    avatarImageType: {
+    avatarUrl: {
         type: String,
         required: false
     },
@@ -53,15 +49,6 @@ const userSchema = new mongoose.Schema({
         default: Date.now,
         require: true,
         index: true
-    }
-});
-
-userSchema.virtual('avatarImagePath').get(function() {
-    if (this.avatarImage != null && this.avatarImageType != null) {
-        return `data:${this.avatarImageType};charset=utf-8;base64,${this.avatarImage.toString('base64')}`;
-    }
-    else {
-        return null;
     }
 });
 

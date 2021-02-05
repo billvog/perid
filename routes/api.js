@@ -1,10 +1,12 @@
 const fs = require('fs');
+const http = require("http");
 const express = require('express');
 const router = express.Router();
 const qrcode = require('qrcode');
 
 // User model
 const User = require('../models/User');
+const { response } = require('express');
 
 // Get one
 router.get('/:id', async (req, res) => {
@@ -43,14 +45,14 @@ router.get('/:id', async (req, res) => {
 router.get('/:id/avatar', async (req, res) => {
     try {
         const user = await User.findById(req.params.id);
-        if (user == null || !user.verified) {
+        if (user == null || !user.verified || !user.avatarUrl) {
             return res.sendStatus(404);
         }
 
-        res.type(user.avatarImageType);
-        res.send(user.avatarImage);
+        res.redirect(user.avatarUrl)
     }
     catch (error) {
+        console.log(error);
         res.sendStatus(500);
     }
 });

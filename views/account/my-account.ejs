@@ -23,23 +23,24 @@
 
         <div class="wraper">
             <% if (query.edit != undefined) { %>
-                <form id="edit-account-form" action="/account/edit" method="POST">
+                <form id="edit-account-form" action="/account/edit" method="POST" enctype="multipart/form-data">
                     <%- include('../partials/form-messages') %> 
-                    <div class="mb-2">
+                    <div class="mb-3">
                         <label for="InputAvatar" class="form-label">User Avatar</label>
-                        <% if (user.avatarImagePath != null) { %> 
-                            <div class="mb-3 remove-avatar-btn">
+                        <% if (user.avatarUrl != null) { %> 
+                            <div class="mb-2 remove-avatar-btn">
                                 <button class="btn btn-danger" type="button"
                                 title="Remove user avatar..."
                                 data-bs-toggle="modal" data-bs-target="#removeAvatarModal">
                                     Remove Avatar...
                                 </button>
+                                <input type="hidden" name="remove_avatar" id="hInputRemoveAvatar" value="false">
                             </div>
                         <% } %> 
                         <div class="choose-avatar"
-                        <% if (user.avatarImagePath != null) { %> style='display:none' <% } %>>
-                            <input type="file" name='avatar'
-                            id="InputAvatar" class="filepond" aria-describedby="mAvatarHelp">
+                        <% if (user.avatarUrl != null) { %> style='display:none' <% } %>>
+                            <input type="file" name="avatar" id="InputAvatar" class="form-control" aria-describedby="mAvatarHelp">
+                            <div id="mAvatarHelp" class="form-text">Only JPG, JPEG, PNG formats allowed. Maximum size: 5MB</div>
                         </div>
                     </div>
                     <div class="mb-2">
@@ -80,7 +81,7 @@
                     <a class="btn btn-secondary" href="/account/my-account"><i class="fas fa-times"></i> Cancel</a>
                 </form>
 
-                <% if (user.avatarImagePath !== null) { %> 
+                <% if (user.avatarUrl !== null) { %> 
                 <!-- Remove Avatar Confirm Modal -->
                 <div class="modal fade" id="removeAvatarModal" tabindex="-1" aria-labelledby="removeAvatarModalLabel" aria-hidden="true">
                     <div class="modal-dialog">
@@ -116,8 +117,8 @@
                             </div>
                         <% } %> 
                         <div class="avatar-wraper">
-                            <% if (user.avatarImagePath !== null) { %>
-                                <img class="user-avatar" src="<%= user.avatarImagePath %>">
+                            <% if (user.avatarUrl !== null) { %>
+                                <img class="user-avatar" src="<%= user.avatarUrl %>">
                             <% } %> 
                             <% if (userQrImage !== null) { %>
                                 <img class="user-qr" src="<%= userQrImage %>">
@@ -145,17 +146,9 @@
 <!-- Bootstrap -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
-<!-- Filepond -->
-<script src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.js"></script>
-<script src="https://unpkg.com/filepond-plugin-file-validate-size/dist/filepond-plugin-file-validate-size.js"></script>
-<script src="https://unpkg.com/filepond-plugin-file-encode/dist/filepond-plugin-file-encode.js"></script>
-<script src="https://unpkg.com/filepond-plugin-image-resize/dist/filepond-plugin-image-resize.js"></script>
-<script src="https://unpkg.com/filepond/dist/filepond.js"></script>
 <!-- Custom -->
-<script src="/js/file-upload.js"></script>
-<% if (query.edit != undefined && user.avatarImagePath != null) { %> 
+<% if (query.edit != undefined && user.avatarUrl != null) { %> 
 <script>
-    let avatarIsRemoved = false;
     // Modal
     var removeAvatarModal;
 
@@ -164,16 +157,10 @@
 
         // Initialize remove avatar confirm modal
         removeAvatarModal = new bootstrap.Modal(document.getElementById('removeAvatarModal'));
-
-        $('form#edit-account-form').on('submit', (e) => {
-            if (!avatarIsRemoved) {
-                $('.choose-avatar input').attr('name', 'blank');
-            }
-        });
     });
     
     function RemoveAvatar() {
-        avatarIsRemoved = true;
+        $('#hInputRemoveAvatar').val('true');
 
         // Hide confirm modal
         removeAvatarModal.hide();
