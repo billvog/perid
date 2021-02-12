@@ -42,6 +42,15 @@ router.post('/login', auth.ensureNotAuthenticated, (req, res, next) => {
         req.login(user, async (error) => {
             if (error) return next(error);
 
+            mailer.sendMail({
+                from: 'Perid <no-reply@perid.tk>',
+                to: user.email,
+                subject: 'Someone logged in to your account at Perid',
+                html: emailTemplates.AccountLoggedIn(user.firstName)
+            }, (error, info) => {
+                // console.log(info, error);
+            });
+
             // Create new session
             jwt.sign({
                 user: req.user.id,
@@ -202,7 +211,6 @@ router.post('/reset-password', auth.ensureNotAuthenticated, async (req, res) => 
                     from: 'Perid <no-reply@perid.tk>',
                     to: foundUser.email,
                     subject: 'Your password for Perid has changed',
-                    // Generate email
                     html: emailTemplates.PasswordHasChanged(foundUser.firstName)
                 }, (error, info) => {
                     // console.log(info, error);
@@ -610,7 +618,6 @@ function sendEmailVerification(user, callback) {
             from: 'Perid <no-reply@perid.tk>',
             to: user.email,
             subject: 'Email verification for Perid',
-            // Generate email
             html: emailTemplates.AccountVerification(user.firstName, `https://perid.tk/account/verify/${token}`)
         }, (error, info) => {
             // console.log(info, error);
@@ -638,7 +645,6 @@ function sendPasswordResetEmail(user, callback) {
             from: 'Perid <no-reply@perid.tk>',
             to: user.email,
             subject: 'Password reset for Perid',
-            // Generate email
             html: emailTemplates.PasswordReset(user.firstName, `https://perid.tk/account/reset-password/${token}`)
         }, (error, info) => {
             // console.log(info, error);

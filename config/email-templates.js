@@ -51,6 +51,26 @@ div.wraper p.bottom-text {
 }`;
 
 module.exports = {
+    AccountLoggedIn: (UserFirstName) => {
+        return `<html>
+        <header>
+            <style>
+            ${styleSheet}
+            </style>
+        </header>
+        <body>
+            <div class="wraper">
+                <h2 class="title">Someone has logged in to your Perid account</h2>
+                <p>Hey there <b>${UserFirstName}</b>,</p>
+                <p>Someone, or maybe you, has logged in to your account at <a target='_blank' href='https://perid.tk/' class="perid-a">Perid</a>.</p>
+                <p>If you didn't logged in then someone else did. The best we can suggest you is to change your password immediately.</p>
+                <p>For any further help, you can contact <a href="mailto:support@perid.tk">support@perid.tk</a>.</p>
+                <p class="bottom-text">© ${year} BILLVOG, email sent from <a href="https://perid.tk" target="_blank" rel="noopener noreferrer">perid.tk</a><br>
+                You have received this email because a user logged in to your account. This email has been sent by a no-reply email account, any reply will be ignored.</p>
+            </div>
+        </body>
+    </html>`
+    },
     AccountVerification: (UserFirstName, Url) => {
         return `<html>
         <header>
