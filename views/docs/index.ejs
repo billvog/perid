@@ -18,12 +18,15 @@
         <%- include('../partials/header') %> 
 
         <div class="wraper">
-            <!-- What's PID -->
-            <fieldset>
+            <!-- What's Perid -->
+            <fieldset id="about">
                 <legend>What's Perid</legend>
                 <p>
-                    Perid is the Virtual Personal ID that contains some basic information about you. <br>
-                    You can share it with people to get in touch with you.
+                    Perid is a Virtual Personal ID that contains some basic information about you. Others, can use it to learn some information about you or get in touch with you.
+                </p>
+                <p>
+                    In a way, Perid is a social network. The only difference from all the other common social networks, is that you cannot upload or share content. In a way, it is 
+                    a social network at it's simplest form.
                 </p>
             </fieldset>
             <div class="spacer"></div>
@@ -34,7 +37,10 @@
                     Perid also provides an API that you can use in your app to find a user registered is our databases. <br>
                     The usage of it is fairly simple;
                     <h5>> Get user by ID</h5>
-                    Getting a user by ID requires a GET request @ <code>https://perid.tk/api/[pid]</code></p>
+                    <p>
+                        Getting a user by ID requires a GET request @ <code>https://perid.tk/api/[pid]</code>
+                        where [pid] is the ID of the user you want to search
+                    </p>
                     <p>
                         The API returns a json object that contains: <br>
                         An <code>error</code> boolean, if true, there was an error, if not, request operated successfully. <br>
@@ -61,12 +67,14 @@
                     </div>
                     <br>
                     <h5>> Get user Avatar or Qr</h5>
-                    If you want to get user's avatar or qr make a GET request @ <code>https://perid.tk/api/[pid]/avatar</code> or <code>https://perid.tk/api/[pid]/qr</code></p>
                     <p>
-                        In this case API returns an image buffer (if succeed).<br>
-                        If the API fails, for some reason to retrieve the image from the server, it will return an <code>500 Internal Server</code> error. <br>
-                        If the provided ID doesn't match to any in the database then it will respond with a <code>404 Not Found</code> error. <br>
+                        If you want to get user's avatar or QR make a GET request @ <code>https://perid.tk/api/[pid]/avatar</code> or <code>https://perid.tk/api/[pid]/qr</code> 
+                        where [pid] is the ID of the user you want to search
                     </p>
+
+                    In this case API returns an image buffer (if succeed).<br>
+                    If the API fails, for some reason to retrieve the image from the server, it will return an <code>500 Internal Server</code> error. <br>
+                    If the provided ID doesn't match to any in the database then it will respond with a <code>404 Not Found</code> error.
                 </p>
             </fieldset>
         </div>

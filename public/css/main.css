@@ -9,6 +9,10 @@ nav.navbar {
     -moz-user-select: none;
 }
 
+p:last-child {
+    margin-bottom: 0;
+}
+
 form {
     user-select: none;
     -moz-user-select: none;

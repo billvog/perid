@@ -20,9 +20,18 @@
 
         <div class="wraper">
             <form id="lookup-pid-form" method="POST">
+                <div class="mb-3">
+                    <h4>Search Engine – Perid</h4>
+                    <p>Use this search engine to find a user by his unique id. Learn more about Perid <a href="/docs#about">here</a>.</p>
+                </div>
+                <hr>
+                <div class="mb-3">
+                    <%- include('./partials/form-messages') %> 
+                </div>
                 <div class="mb-2">
                     <label for="InputId" class="form-label">User ID</label>
-                    <input type="text" class="form-control" id="InputId" required>
+                    <input type="text" class="form-control" id="InputId" placeholder="Enter user's ID" required
+                    value="<%= typeof query != 'undefined' ? query : '' %>">
                 </div>
                 <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Find User</button>
             </form>

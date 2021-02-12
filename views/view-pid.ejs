@@ -25,7 +25,7 @@
 
         <div class="wraper">
             <%- include('./partials/form-messages') %> 
-            <% if (typeof foundUser !== 'undefined') { %>
+            <% if (typeof foundUser != 'undefined') { %>
                 <div class="alert alert-success">
                     <fieldset>
                         <legend><%= foundUser.firstName %> <%= foundUser.middleName %> <%= foundUser.lastName %></legend>
