@@ -1,10 +1,12 @@
 const nodemailer = require('nodemailer');
 
-var transporter = nodemailer.createTransport({
-    service: 'gmail',
+// Connect to my SMTP server
+const transporter = nodemailer.createTransport({
+    host: 'email-smtp.eu-central-1.amazonaws.com',
+    port: 465,
     auth: {
-        user: 'main.perid.tk@gmail.com',
-        pass: 'nush-zaben=basiles-bogiatzhs'
+        user: 'AKIAUVR55PW3I5APG25F',
+        pass: 'BIIrfZKeQfSQvi2JPBZrceeTtNU7ntlhdVAolvVhKxjP'
     }
 });
 

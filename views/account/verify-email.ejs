@@ -47,9 +47,12 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <%- include('../partials/form-messages.ejs') %> 
-                    <form action="/account/edit/email" method="POST">
+                    <% if (typeof query != 'undefined') { %> 
+                        <%- include('../partials/form-messages') %> 
+                    <% } %> 
+                    <form action="/account/verify-email" method="POST">
                         <div class="mb-3">
+                            <input type="hidden" name="action" value="change-email">
                             <label for="emailInput" class="form-label">Email address</label>
                             <input type="email" class="form-control" id="emailInput" name="email"
                             value="<%= typeof email != 'undefined' ? email : user.email %>">

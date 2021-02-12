@@ -1,3 +1,5 @@
+<% const EditAccount = (typeof edit != 'undefined' && edit == true) %> 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,8 +12,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
     <!-- Fontawesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
-    <!-- Filepond -->
-    <link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet">
     <!-- Custom -->
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/user-form.css">
@@ -22,8 +22,8 @@
         <%- include('../partials/header') %> 
 
         <div class="wraper">
-            <% if (query.edit != undefined) { %>
-                <form id="edit-account-form" action="/account/edit" method="POST" enctype="multipart/form-data">
+            <% if (EditAccount) { %>
+                <form id="edit-account-form" class="validate-u-form" action="/account/my-account/edit" method="POST" enctype="multipart/form-data">
                     <%- include('../partials/form-messages') %> 
                     <div class="mb-3">
                         <label for="InputAvatar" class="form-label">User Avatar</label>
@@ -39,7 +39,14 @@
                         <% } %> 
                         <div class="choose-avatar"
                         <% if (user.avatarUrl != null) { %> style='display:none' <% } %>>
-                            <input type="file" name="avatar" id="InputAvatar" class="form-control" aria-describedby="mAvatarHelp">
+                            <div class="row g-3">
+                                <div class="col-md-auto">
+                                    <input type="file" name="avatar" id="InputAvatar" class="form-control" aria-describedby="mAvatarHelp">
+                                </div>
+                                <div class="col">
+                                    <input type="button" value="Clear" id="ClearAvatarInput" class="btn btn-danger">
+                                </div>
+                            </div>
                             <div id="mAvatarHelp" class="form-text">Only JPG, JPEG, PNG formats allowed. Maximum size: 5MB</div>
                         </div>
                     </div>
@@ -68,9 +75,9 @@
                     <div class="row phone-numbers-group">
                         <!-- Phone -->
                         <div class="col-sm mb-2">
-                            <label for="InputPhone" class="form-label">Phone (*)</label>
-                            <input type="tel" class="form-control" id="InputPhone" name="phone" placeholder="Enter Phone"
-                            value="<%= typeof phone != 'undefined' ? phone : user.phone %>">
+                            <label for="InputPhone" class="form-label">Phone</label>
+                            <input type="tel" class="form-control" id="InputPhone" name="phone" placeholder="Enter Phone" autocomplete="tel"
+                            value="<%= typeof phone != 'undefined' ? phone : user.phone != null ? user.phone : '' %>">
                         </div>
                     </div>
                     <div class="mb-3">
@@ -79,6 +86,9 @@
                     </div>
                     <button type="submit" class="btn btn-primary"><i class="fas fa-check"></i> Save</button>
                     <a class="btn btn-secondary" href="/account/my-account"><i class="fas fa-times"></i> Cancel</a>
+                    <div class="form-bottom-text f-right">
+                        (*) are required fields
+                    </div>
                 </form>
 
                 <% if (user.avatarUrl !== null) { %> 
@@ -105,7 +115,7 @@
                 <%- include('../partials/form-messages') %> 
                 <fieldset>
                     <legend>
-                        <a href="?edit" title='Edit My Account'><i class="fas fa-user-edit"></i></a> 
+                        <a href="/account/my-account/edit" title='Edit My Account'><i class="fas fa-user-edit"></i></a> 
                         Account Information
                     </legend>
                     <span>
@@ -117,10 +127,10 @@
                             </div>
                         <% } %> 
                         <div class="avatar-wraper">
-                            <% if (user.avatarUrl !== null) { %>
+                            <% if (typeof user.avatarUrl != 'undefined' && user.avatarUrl !== null) { %>
                                 <img class="user-avatar" src="<%= user.avatarUrl %>">
                             <% } %> 
-                            <% if (userQrImage !== null) { %>
+                            <% if (typeof userQrImage != 'undefined' && userQrImage !== null) { %>
                                 <img class="user-qr" src="<%= userQrImage %>">
                             <% } else { %> 
                                 <img class="user-qr" src="/assets/NoQrAvailable.png"
@@ -132,8 +142,12 @@
                             <b>Full Name</b> <%= user.firstName %> <%= user.middleName %> <%= user.lastName %><br>
                             <b>Birthdate</b> <%= new Date(user.birthdate).toLocaleString().split(',')[0] %><br>
                             <div class="phone-numbers-group">
-                                <!-- Phone -->
-                                <b>Phone</b> <a href="tel:<%= user.phone %>"><%= user.phone %></a><br>
+                                <% if (user.phone != null) { %> 
+                                    <!-- Phone -->
+                                    <b>Phone</b> <a href="tel:<%= user.phone %>"><%= user.phone %></a><br>
+                                <% } else { %> 
+                                    <i>No phone provided</i>
+                                <% } %> 
                             </div>
                             <b>Email</b> <a href="mailto:<%= user.email %>"><%= user.email %></a>
                         </div>
@@ -147,7 +161,8 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
 <!-- Custom -->
-<% if (query.edit != undefined && user.avatarUrl != null) { %> 
+<script src="/js/user-form-validation.js"></script>
+<% if (EditAccount && user.avatarUrl != null) { %> 
 <script>
     // Modal
     var removeAvatarModal;

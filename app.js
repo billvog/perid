@@ -11,10 +11,10 @@ const app = express();
 require('./config/passport')(passport);
 
 // Connect to DB
-mongoose.connect(process.env.DB_URI, {
-    useNewUrlParser: true, 
-    useCreateIndex: true, 
-    useUnifiedTopology: true, 
+mongoose.connect(process.env.LOCAL_DB_URI, {
+    useNewUrlParser: true,
+    useCreateIndex: true,
+    useUnifiedTopology: true,
     useFindAndModify: false
 });
 

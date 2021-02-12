@@ -45,8 +45,12 @@
                             <b>Full Name</b> <%= foundUser.firstName %> <%= foundUser.middleName %> <%= foundUser.lastName %><br>
                             <b>Birthdate</b> <%= new Date(foundUser.birthdate).toLocaleString().split(',')[0] %><br>
                             <div class="phone-numbers-group">
-                                <!-- Phone -->
-                                <b>Phone</b> <a href="tel:<%= foundUser.phone %>"><%= foundUser.phone %></a><br>
+                                <% if (user.phone != null) { %> 
+                                    <!-- Phone -->
+                                    <b>Phone</b> <a href="tel:<%= foundUser.phone %>"><%= foundUser.phone %></a><br>
+                                <% } else { %> 
+                                    <i>No phone provided</i>
+                                <% } %> 
                             </div>
                             <b>Email</b> <a href="mailto:<%= foundUser.email %>"><%= foundUser.email %></a>
                         </div>

@@ -1,4 +1,5 @@
 const fs = require('fs');
+const path = require('path'); 
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
@@ -8,6 +9,7 @@ const jwt = require('jsonwebtoken');
 
 // Custom config
 const mailer = require('../config/nodemailer');
+const emailTemplates = require('../config/email-templates');
 const multer = require('../config/multer');
 const cloudinary = require('../config/cloudinary');
 
@@ -20,45 +22,11 @@ const allowedImageFormats = [
 // User model
 const User = require('../models/User');
 
-// Register page
-router.get('/register', auth.ensureNotAuthenticated, (req, res) => {
-    res.render('account/register');
-});
-
 // Login page
 router.get('/login', auth.ensureNotAuthenticated, (req, res) => {
     res.render('account/login');
 });
 
-// Logout page
-router.delete('/logout', auth.ensureAuthenticated, async (req, res) => {
-    // Delete session
-    res.cookie('sessid', '', { maxAge: 0 });
-
-    // Logout user
-    req.logout();
-
-    req.flash('success_msg', 'You are logged out');
-    res.redirect('/account/login');
-});
-
-// My Account page
-router.get('/my-account', auth.ensureAuthenticated, async (req, res) => {
-    res.render('account/my-account', {
-        user: req.user,
-        userQrImage: await req.user.qrImagePath,
-        query: req.query
-    });
-});
-
-// Verify email page
-router.get('/verify-email', auth.ensureAuthenticated, auth.ensureNotVerified, (req, res) => {
-    res.render('account/verify-email', {
-        user: req.user
-    });
-});
-
-// Handle login
 router.post('/login', auth.ensureNotAuthenticated, (req, res, next) => {
     const { email } = req.body;
 
@@ -77,7 +45,8 @@ router.post('/login', auth.ensureNotAuthenticated, (req, res, next) => {
 
             // Create new session
             jwt.sign({
-                user: req.user.id
+                user: req.user.id,
+                type: 'sessid'
             }, process.env.JWT_SECRET, {
                 expiresIn: '30d'
             }, (error, sessid) => {
@@ -94,7 +63,118 @@ router.post('/login', auth.ensureNotAuthenticated, (req, res, next) => {
     })(req, res, next);
 });
 
+// Logout page
+router.delete('/logout', auth.ensureAuthenticated, async (req, res) => {
+    // Delete session
+    res.cookie('sessid', '', { maxAge: 0 });
+
+    // Logout user
+    req.logout();
+
+    req.flash('success_msg', 'You are logged out');
+    res.redirect('/account/login');
+});
+
+// Verify email page
+router.get('/verify-email', auth.ensureAuthenticated, auth.ensureNotVerified, (req, res) => {
+    res.render('account/verify-email', {
+        user: req.user
+    });
+});
+
+// Handle account editing for unverified users
+router.post('/verify-email', auth.ensureAuthenticated, auth.ensureNotVerified, async (req, res) => {
+    const {
+        action
+    } = req.body;
+    let errors = [];
+
+    if (action == 'change-email') {
+        const {
+            email
+        } = req.body;
+
+        // Check for empty fields
+        if (!email) {
+            errors.push({ message: 'Please fill a valid email adress' });
+        }
+
+        // Check if the same email is used
+        if (email == req.user.email) {
+            errors.push({ message: 'This email is already is use by you' });
+        }
+        // Check if email is registered
+        else if (await User.findOne({ email: email }) != null) {
+            errors.push({ message: 'This email is already registered' });
+        }
+
+        if (errors.length > 0) {
+            return res.render('account/verify-email', {
+                user: req.user,
+                query: { prompt: 'change-email' },
+                errors,
+                // Input Fields
+                email
+            });
+        }
+
+        req.user.email = email;
+
+        // Save modified user
+        req.user.save()
+        .then(() => {
+            req.flash('success_msg', 'Your email has been changed');
+            res.redirect('/account/verify-email');
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+    }
+    else {
+        res.sendStatus(400);
+    }
+});
+
 // Handle email verification
+router.get('/verify/:token', auth.ensureNotVerified, async (req, res) => {
+    try {
+        const {
+            user: id,
+            type
+        } = jwt.verify(req.params.token, process.env.JWT_SECRET);
+
+        if (type == 'account-verify-token') {
+            await User.findOneAndUpdate({ _id: id }, {
+                verified: true
+            });
+        }
+        else {
+            return res.render('account/verify-email', {
+                user: req.user || undefined,
+                errors: [{ message: "This token cannot be validated" }]
+            });
+        }
+    }
+    catch (error) {
+        if (error.name == 'TokenExpiredError') {
+            return res.render('account/verify-email', {
+                user: req.user || undefined,
+                errors: [{ message: "This token has been expired" }]
+            });
+        }
+        else {
+            console.log(error);
+            return res.render('account/verify-email', {
+                user: req.user || undefined,
+                errors: [{ message: "Invalid token. Please try sending the email again." }]
+            });
+        }
+    }
+
+    req.flash('success_msg', 'Your account has been verified');
+    res.redirect('/account/my-account');
+});
+
 router.post('/send-email-verification', auth.ensureAuthenticated, auth.ensureNotVerified, (req, res) => {
     sendEmailVerification(req.user, (error, info) => {
         if (error) {
@@ -106,35 +186,17 @@ router.post('/send-email-verification', auth.ensureAuthenticated, auth.ensureNot
         else {
             res.render('account/verify-email', {
                 user: req.user,
-                success_msg: "Verification email has been sent"
+                success_msg: "Verification email has been sent (check spam folder)"
             });
         }
     });
 });
 
-router.get('/verify/:token', auth.ensureNotVerified, async (req, res) => {
-    try {
-        const { user: id } = jwt.verify(req.params.token, process.env.JWT_SECRET);
-        await User.findOneAndUpdate({ _id: id }, {
-            verified: true
-        });
-    }
-    catch (error) {
-        if (error.name == 'TokenExpiredError') {
-            return res.render('account/verify-email', {
-                user: req.user || undefined,
-                errors: [{ message: "This token has been expired" }]
-            });
-        }
-
-        console.log(error);
-    }
-
-    req.flash('success_msg', 'Your account has been verified');
-    res.redirect('/account/my-account');
+// Register page
+router.get('/register', auth.ensureNotAuthenticated, (req, res) => {
+    res.render('account/register');
 });
 
-// Handle register
 router.post('/register', auth.ensureNotAuthenticated, multer.single('avatar'), async (req, res) => {
     const {
         firstName, middleName, lastName,
@@ -148,7 +210,7 @@ router.post('/register', auth.ensureNotAuthenticated, multer.single('avatar'), a
 
     try {
         // Check for empty fields
-        if (!firstName || !lastName || !birthdate || !phone || !email || !password || !passwordConfirm) {
+        if (!firstName || !lastName || !birthdate || !email || !password || !passwordConfirm) {
             errors.push({ message: 'Please fill all the required fields' });
         }
 
@@ -164,8 +226,8 @@ router.post('/register', auth.ensureNotAuthenticated, multer.single('avatar'), a
             }
         }
 
-        // Validate phones
-        if (!phone.match('^[+]?[0-9]+$')) {
+        // Validate phone
+        if (phone && !phone.match('^[+]?[0-9]+$')) {
             errors.push({ message: 'Phone number is invalid' });
         }
 
@@ -193,7 +255,7 @@ router.post('/register', auth.ensureNotAuthenticated, multer.single('avatar'), a
                 // Input Fields
                 firstName, middleName, lastName,
                 birthdate: birthdate || undefined,
-                phone,
+                phone: phone || undefined,
                 email
             });
         }
@@ -201,7 +263,7 @@ router.post('/register', auth.ensureNotAuthenticated, multer.single('avatar'), a
         const NewUser = new User({
             firstName, middleName, lastName,
             birthdate,
-            phone,
+            phone: phone || null,
             email,
             password
         });
@@ -252,52 +314,23 @@ router.post('/register', auth.ensureNotAuthenticated, multer.single('avatar'), a
     }
 });
 
-// Handle email editing while not verified (in case of miss-typed email)
-router.post('/edit/email', auth.ensureAuthenticated, auth.ensureNotVerified, async (req, res) => {
-    const {
-        email
-    } = req.body;
-    let errors = [];
-
-    // Check for empty fields
-    if (!email) {
-        errors.push({ message: 'Please fill a valid email adress' });
-    }
-
-    // Check if the same email is used
-    if (email == req.user.email) {
-        errors.push({ message: 'This email is already is use by you' });
-    }
-    // Check if email is registered
-    else if (await User.findOne({ email: email }) != null) {
-        errors.push({ message: 'This email is already registered' });
-    }
-
-    if (errors.length > 0) {
-        return res.render('account/verify-email', {
-            user: req.user,
-            query: { prompt: 'change-email' },
-            errors,
-            // Input Fields
-            email
-        });
-    }
-
-    req.user.email = email;
-
-    // Save modified user
-    req.user.save()
-    .then(() => {
-        req.flash('success_msg', 'Your email has been changed');
-        res.redirect('/account/verify-email');
-    })
-    .catch((error) => {
-        console.log(error);
+// My account page
+router.get('/my-account', auth.ensureAuthenticated, async (req, res) => {
+    res.render('account/my-account', {
+        user: req.user,
+        userQrImage: await req.user.qrImagePath
     });
 });
 
-// Handle edit
-router.post('/edit', auth.ensureAuthenticated, multer.single('avatar'), async (req, res) => {
+// Edit my account page
+router.get('/my-account/edit', auth.ensureAuthenticated, (req, res) => {
+    res.render('account/my-account', {
+        user: req.user,
+        edit: true
+    });
+});
+
+router.post('/my-account/edit', auth.ensureAuthenticated, multer.single('avatar'), async (req, res) => {
     const {
         firstName, middleName, lastName,
         birthdate,
@@ -308,7 +341,7 @@ router.post('/edit', auth.ensureAuthenticated, multer.single('avatar'), async (r
 
     try {
         // Check for empty fields
-        if (!firstName || !lastName || !birthdate || !phone || !passwordConfirm) {
+        if (!firstName || !lastName || !birthdate || !passwordConfirm) {
             errors.push({ message: 'Please fill all the required fields' });
         }
 
@@ -325,7 +358,7 @@ router.post('/edit', auth.ensureAuthenticated, multer.single('avatar'), async (r
         }
 
         // Validate phones
-        if (!phone.match('^[+]?[0-9]+$')) {
+        if (phone && !phone.match('^[+]?[0-9]+$')) {
             errors.push({ message: 'Phone number is invalid' });
         }
 
@@ -336,19 +369,21 @@ router.post('/edit', auth.ensureAuthenticated, multer.single('avatar'), async (r
         }
 
         if (errors.length > 0) {
-            // Remove uploaded image from temp
+            // Remove uploaded image from tmp
             if (fs.existsSync(`tmp/user-avatars/${req.user.id}`)) {
-                fs.rm(`tmp/user-avatars/${req.user.id}`, (err) => { if (err) throw err });
+                fs.unlink(`tmp/user-avatars/${req.user.id}`, (error) => {
+                    if (error) console.log(error);
+                });
             }
 
             return res.render('account/my-account', {
                 user: req.user,
-                query: { edit: '' },
+                edit: true,
                 errors,
                 // Input Fields
                 firstName, middleName, lastName,
                 birthdate: birthdate || undefined,
-                phone
+                phone: phone || undefined
             });
         }
 
@@ -363,7 +398,10 @@ router.post('/edit', auth.ensureAuthenticated, multer.single('avatar'), async (r
                 transformation: [{ width: 256, height: 256, gravity: 'face', crop: 'fill' }]
             }, (error) => {
                 // Remove uploaded image from temp
-                fs.rm(`tmp/user-avatars/${req.user.id}`, (err) => { if (err) throw err });
+                fs.unlink(`tmp/user-avatars/${req.user.id}`, (error) => {
+                    if (error) console.log(error);
+                });
+                
                 if (error) throw error;
             });
 
@@ -383,7 +421,7 @@ router.post('/edit', auth.ensureAuthenticated, multer.single('avatar'), async (r
         req.user.middleName = middleName;
         req.user.lastName = lastName;
         req.user.birthdate = birthdate;
-        req.user.phone = phone;
+        req.user.phone = phone || null;
     
         // Save modified user
         await req.user.save();
@@ -396,32 +434,24 @@ router.post('/edit', auth.ensureAuthenticated, multer.single('avatar'), async (r
     }
 });
 
+// Send email verification email
 function sendEmailVerification(user, callback) {
     jwt.sign({
-        user: user.id
+        user: user.id,
+        type: 'account-verify-token'
     }, process.env.JWT_SECRET, {
         expiresIn: '10m'
     }, (error, token) => {
         if (error) return callback(error);
 
-        const url = `https://perid.tk/account/verify/${token}`;
-        
         mailer.sendMail({
-            from: 'Perid.tk <main.perid.tk@gmail.com>',
+            from: 'Perid <no-reply@perid.tk>',
             to: user.email,
-            subject: 'Email verification from Perid.tk',
-            html: `
-            <div style='font-family:Arial,Helvetica,sans-serif !important; padding:15px 20px; border-radius:5px; background-color:#212529; color:#C3C4C5 !important;'>
-            <h2>Verify your email address for Perid.tk</h2>
-            <p>Hey there ${user.firstName},</p>
-            <p>Your email has been recently used to create an account to <a target='_blank' href='https://perid.tk/'>Perid</a>.</p>
-            <p>If you don't verify your email address you won't be visible in search and your account will be deleted in 30 days from the registration date.</p>
-            <p>Click <a target='_blank' href="${url}" style='color:gold;'>here</a> to verify your email address or click the following link:<br>
-            <a target='_blank' href="${url}" style='color:goldenrod;'>${url}</a></p>
-            <p>This email has been sent by a no-reply email account. Any reply will be ignored.</p>
-            </div>
-            `
+            subject: 'Email verification from Perid',
+            // Generate email
+            html: emailTemplates.AccountVerification(user.firstName, `https://perid.tk/account/verify/${token}`)
         }, (error, info) => {
+            console.log(info, error);
             if (error) {
                 callback(error);
             }

@@ -8,13 +8,16 @@ module.exports = async function(req, res, next) {
     if ((req.cookies.sessid != null && req.cookies.sessid.length > 0) && !req.isAuthenticated()) {
         try {
             // Get assoc uid from jwt
-            const { user: id } = jwt.verify(req.cookies.sessid, process.env.JWT_SECRET);
+            const {
+                user: id,
+                type
+            } = jwt.verify(req.cookies.sessid, process.env.JWT_SECRET);
             const user = await User.findOne({ _id: id });
 
             // Clear cookie
             res.cookie('sessid', '', { maxAge: 0 });
 
-            if (user != null) {
+            if (type == 'sessid' && user != null) {
                 // Login found user
                 req.login(user, (e) => {
                     if (e) throw e;
@@ -22,7 +25,8 @@ module.exports = async function(req, res, next) {
     
                 // Create new session
                 const sessid = await jwt.sign({
-                    user: user.id
+                    user: user.id,
+                    type: 'sessid'
                 }, process.env.JWT_SECRET, {
                     expiresIn: '30d'
                 });
@@ -34,14 +38,18 @@ module.exports = async function(req, res, next) {
             }
         }
         catch (error) {
-            throw error;
+            console.log(error);
+            
+            // Clear cookie
+            res.cookie('sessid', '', { maxAge: 0 });
         }
     }
     // Check if user is authenticated
     else if ((req.cookies.sessid == null || req.cookies.sessid.length <= 0) && req.isAuthenticated()) {
         // Create new session
         const sessid = await jwt.sign({
-            user: req.user.id
+            user: req.user.id,
+            type: 'sessid'
         }, process.env.JWT_SECRET, {
             expiresIn: '30d'
         });

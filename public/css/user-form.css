@@ -4,3 +4,12 @@ form div.phone-numbers-group {
     padding: 8px 0;
     margin: 13px 0;
 }
+
+form div.form-bottom-text {
+    font-size: 10pt;
+    color: gray;
+}
+
+form .f-right {
+    float: right;
+}
