@@ -1,0 +1,2 @@
+- Add user authentication with JWT through API
+- Change email, password and delete account while logged in
