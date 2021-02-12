@@ -1,5 +1,4 @@
 const fs = require('fs');
-const path = require('path'); 
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
@@ -73,6 +72,170 @@ router.delete('/logout', auth.ensureAuthenticated, async (req, res) => {
 
     req.flash('success_msg', 'You are logged out');
     res.redirect('/account/login');
+});
+
+// Forgot password page
+router.get('/forgot-password', auth.ensureNotAuthenticated, (req, res) => {
+    res.render('account/forgot-password', {});
+});
+
+router.post('/forgot-password', auth.ensureNotAuthenticated, async (req, res) => {
+    const {
+        email
+    } = req.body;
+    let errors = [];
+
+    // Validate fields
+    if (!email) {
+        errors.push({ message: 'Please fill a valid email address'});
+    }
+
+    if (email) {
+        const foundUser = await User.findOne({ email });
+        if (foundUser == null) {
+            errors.push({ message: 'This email is not associated with a user'});
+        }
+        else {
+            sendPasswordResetEmail(foundUser, (error, info) => {
+                if (error) {
+                    res.render('account/forgot-password', {
+                        errors: [{ message: error.message }],
+                        // Input Fields
+                        email
+                    });
+                }
+                else {
+                    res.render('account/forgot-password', {
+                        success_msg: "Password reset email has been sent (check spam folder)"
+                    });
+                }
+            });
+        }
+    }
+
+    if (errors.length > 0) {
+        return res.render('account/forgot-password', {
+            errors,
+            // Input Fields
+            email
+        });
+    }
+});
+
+// Reset password page
+router.get('/reset-password/:token', auth.ensureNotAuthenticated, (req, res) => {
+    const token = req.params.token;
+
+    // Check if token is valid
+    try {
+        jwt.verify(token, process.env.JWT_SECRET);
+    }
+    catch (error) {
+        return res.render('account/reset-password', {
+            errors: [{ message: 'This token is not longer valid' }]
+        });
+    }
+    
+    res.render('account/reset-password', {
+        token
+    });
+});
+
+router.post('/reset-password', auth.ensureNotAuthenticated, async (req, res) => {
+    const {
+        token,
+        password, passwordConfirm
+    } = req.body;
+    let errors = [];
+
+    // Check for empty fields
+    if (!token || !password || !passwordConfirm) {
+        errors.push({ message: 'Please fill all required fields' });
+    }
+
+    // Validate password
+    if (password.length < 6) {
+        errors.push({ message: 'Password must be at least 6 characters' });
+    }
+
+    // Check if passwords match
+    if (password && passwordConfirm && password !== passwordConfirm) {
+        errors.push({ message: 'Passwords do not match' });
+    }
+
+    if (errors.length > 0) {
+        return res.render('account/reset-password', {
+            errors,
+            // Input fields
+            token
+        });
+    }
+
+    try {
+        const {
+            user: id,
+            type
+        } = jwt.verify(token, process.env.JWT_SECRET);
+        
+        if (type == 'password-reset-token') {
+            const foundUser = await User.findOne({ _id: id });
+
+            // Check if new password is different from old
+            if (bcrypt.compareSync(password, foundUser.password)) {
+                return res.render('account/reset-password', {
+                    errors: [{ message: 'Please create a new password that differs from your old one' }],
+                    // Input fields
+                    token
+                });
+            }
+
+            // Set password
+            bcrypt.hash(password, 10, async (error, hash) => {
+                if (error) throw error;
+
+                // Save user
+                foundUser.password = hash;
+                await foundUser.save();
+
+                // Send email to inform
+                mailer.sendMail({
+                    from: 'Perid <no-reply@perid.tk>',
+                    to: foundUser.email,
+                    subject: 'Your password for Perid has changed',
+                    // Generate email
+                    html: emailTemplates.PasswordHasChanged(foundUser.firstName)
+                }, (error, info) => {
+                    // console.log(info, error);
+                });
+
+                return res.render('account/reset-password', {
+                    success_msg: 'Your password has been changed'
+                });
+            });
+        }
+        else {
+            return res.render('account/verify-email', {
+                user: req.user || undefined,
+                errors: [{ message: "This token cannot be validated" }]
+            });
+        }
+    }
+    catch (error) {
+        if (error.name == 'TokenExpiredError') {
+            return res.render('account/reset-password', {
+                errors: [{ message: "This token has been expired" }],
+                // Input fields
+                token
+            });
+        }
+        else {
+            return res.render('account/reset-password', {
+                errors: [{ message: "Invalid token. Please try sending the email again." }],
+                // Input fields
+                token
+            });
+        }
+    }
 });
 
 // Verify email page
@@ -163,7 +326,6 @@ router.get('/verify/:token', auth.ensureNotVerified, async (req, res) => {
             });
         }
         else {
-            console.log(error);
             return res.render('account/verify-email', {
                 user: req.user || undefined,
                 errors: [{ message: "Invalid token. Please try sending the email again." }]
@@ -310,7 +472,7 @@ router.post('/register', auth.ensureNotAuthenticated, multer.single('avatar'), a
         });
     }
     catch (error) {
-        
+        throw error;
     }
 });
 
@@ -447,11 +609,40 @@ function sendEmailVerification(user, callback) {
         mailer.sendMail({
             from: 'Perid <no-reply@perid.tk>',
             to: user.email,
-            subject: 'Email verification from Perid',
+            subject: 'Email verification for Perid',
             // Generate email
             html: emailTemplates.AccountVerification(user.firstName, `https://perid.tk/account/verify/${token}`)
         }, (error, info) => {
-            console.log(info, error);
+            // console.log(info, error);
+            
+            if (error) {
+                callback(error);
+            }
+            else {
+                callback(null, info);
+            }
+        });
+    });
+}
+
+function sendPasswordResetEmail(user, callback) {
+    jwt.sign({
+        user: user.id,
+        type: 'password-reset-token'
+    }, process.env.JWT_SECRET, {
+        expiresIn: '10m'
+    }, (error, token) => {
+        if (error) return callback(error);
+        
+        mailer.sendMail({
+            from: 'Perid <no-reply@perid.tk>',
+            to: user.email,
+            subject: 'Password reset for Perid',
+            // Generate email
+            html: emailTemplates.PasswordReset(user.firstName, `https://perid.tk/account/reset-password/${token}`)
+        }, (error, info) => {
+            // console.log(info, error);
+            
             if (error) {
                 callback(error);
             }
