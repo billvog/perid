@@ -21,50 +21,55 @@
         <div class="wraper">
             <form id="create-pid-form" class="validate-u-form" action="/account/register" method="POST" autocomplete="off">
                 <%- include('../partials/form-messages') %>
+                <!-- Avatar -->
                 <div class="mb-3">
                     <label for="InputAvatar" class="form-label">User Avatar</label>
                     <input type="file" name="avatar" id="InputAvatar" class="form-control" aria-describedby="mAvatarHelp">
                     <div id="mAvatarHelp" class="form-text">Only JPG, JPEG, PNG formats allowed. Maximum size: 5MB</div>
                 </div>
+                <!-- First Name -->
                 <div class="mb-2">
                     <label for="InputFName" class="form-label">First Name (*)</label>
                     <input type="text" class="form-control" id="InputFName" name="firstName" placeholder="Enter First Name"
                     value="<%= typeof firstName != 'undefined' ? firstName : '' %>" required>
                 </div>
+                <!-- Middle Name -->
                 <div class="mb-2">
                     <label for="InputMName" class="form-label">Middle Name</label>
                     <input type="text" class="form-control" id="InputMName" name="middleName" placeholder="Enter Middle Name"
                     value="<%= typeof middleName != 'undefined' ? middleName : '' %>" aria-describedby="mNameHelp">
                     <div id="mNameHelp" class="form-text">Leave blank if you don't have one</div>
                 </div>
+                <!-- Last Name -->
                 <div class="mb-2">
                     <label for="InputLName" class="form-label">Last Name (*)</label>
                     <input type="text" class="form-control" id="InputLName" name="lastName" placeholder="Enter Last Name"
                     value="<%= typeof lastName != 'undefined' ? lastName : '' %>" required>
                 </div>
+                <!-- Birthdate -->
                 <div class="mb-2">
                     <label for="InputBDate" class="form-label">Birthdate (*)</label>
                     <input type="date" class="form-control" id="InputBDate" name="birthdate"
                     value="<%= typeof birthdate != 'undefined' ? new Date(birthdate).toISOString().split('T')[0] : '' %>" required>
                 </div>
-                <!-- Phone Group -->
-                <div class="row phone-numbers-group">
-                    <!-- Phone -->
-                    <div class="col-sm mb-2">
-                        <label for="InputPhone" class="form-label">Phone</label>
-                        <input type="tel" class="form-control" id="InputPhone" name="phone" placeholder="Enter Phone"
-                        value="<%= typeof phone != 'undefined' ? phone : '' %>">
-                    </div>
+                <!-- Phone -->
+                <div class="col-sm mb-2">
+                    <label for="InputPhone" class="form-label">Phone</label>
+                    <input type="tel" class="form-control" id="InputPhone" name="phone" placeholder="Enter Phone"
+                    value="<%= typeof phone != 'undefined' ? phone : '' %>">
                 </div>
+                <!-- Email -->
                 <div class="mb-2">
                     <label for="InputEMail" class="form-label">Email (*)</label>
                     <input type="email" class="form-control" id="InputEMail" name="email" placeholder="Enter Email"
                     value="<%= typeof email != 'undefined' ? email : '' %>" required>
                 </div>
+                <!-- Password -->
                 <div class="mb-2">
                     <label for="InputPassword" class="form-label">Password (*)</label>
                     <input type="password" class="form-control" id="InputPassword" name="password" placeholder="Enter Password" required>
                 </div>
+                <!-- Confirm Password -->
                 <div class="mb-3">
                     <label for="InputPasswordConfirm" class="form-label">Confirm Password (*)</label>
                     <input type="password" class="form-control" id="InputPasswordConfirm" name="passwordConfirm" placeholder="Repeat Password" required>

@@ -25,6 +25,7 @@
             <% if (EditAccount) { %>
                 <form id="edit-account-form" class="validate-u-form" action="/account/my-account/edit" method="POST" enctype="multipart/form-data">
                     <%- include('../partials/form-messages') %> 
+                    <!-- Avatar -->
                     <div class="mb-3">
                         <label for="InputAvatar" class="form-label">User Avatar</label>
                         <% if (user.avatarUrl != null) { %> 
@@ -50,36 +51,38 @@
                             <div id="mAvatarHelp" class="form-text">Only JPG, JPEG, PNG formats allowed. Maximum size: 5MB</div>
                         </div>
                     </div>
+                    <!-- First Name -->
                     <div class="mb-2">
                         <label for="InputFName" class="form-label">First Name (*)</label>
                         <input type="text" class="form-control" id="InputFName" name="firstName" placeholder="Enter First Name"
                         value="<%= typeof firstName != 'undefined' ? firstName : user.firstName %>">
                     </div>
+                    <!-- Middle Name -->
                     <div class="mb-2">
                         <label for="InputMName" class="form-label">Middle Name</label>
                         <input type="text" class="form-control" id="InputMName" name="middleName" placeholder="Enter Middle Name"
                         value="<%= typeof middleName != 'undefined' ? middleName : user.middleName %>" aria-describedby="mNameHelp">
                         <div id="mNameHelp" class="form-text">Leave blank if you don't have one</div>
                     </div>
+                    <!-- Last Name -->
                     <div class="mb-2">
                         <label for="InputLName" class="form-label">Last Name (*)</label>
                         <input type="text" class="form-control" id="InputLName" name="lastName" placeholder="Enter Last Name"
                         value="<%= typeof lastName != 'undefined' ? lastName : user.lastName %>">
                     </div>
+                    <!-- Birthdate -->
                     <div class="mb-2">
                         <label for="InputBDate" class="form-label">Birthdate (*)</label>
                         <input type="date" class="form-control" id="InputBDate" name="birthdate"
                         value="<%= typeof birthdate != 'undefined' ? new Date(birthdate).toISOString().split('T')[0] : new Date(user.birthdate).toISOString().split('T')[0] %>">
                     </div>
-                    <!-- Phone Group -->
-                    <div class="row phone-numbers-group">
-                        <!-- Phone -->
-                        <div class="col-sm mb-2">
-                            <label for="InputPhone" class="form-label">Phone</label>
-                            <input type="tel" class="form-control" id="InputPhone" name="phone" placeholder="Enter Phone" autocomplete="tel"
-                            value="<%= typeof phone != 'undefined' ? phone : user.phone != null ? user.phone : '' %>">
-                        </div>
+                    <!-- Phone -->
+                    <div class="col-sm mb-2">
+                        <label for="InputPhone" class="form-label">Phone</label>
+                        <input type="tel" class="form-control" id="InputPhone" name="phone" placeholder="Enter Phone" autocomplete="tel"
+                        value="<%= typeof phone != 'undefined' ? phone : user.phone != null ? user.phone : '' %>">
                     </div>
+                    <!-- Confirm Password -->
                     <div class="mb-3">
                         <label for="InputPasswordConfirm" class="form-label">Confirm Password (*)</label>
                         <input type="password" class="form-control" id="InputPasswordConfirm" name="passwordConfirm" placeholder="Confirm Password" required>
