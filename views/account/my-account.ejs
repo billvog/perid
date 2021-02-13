@@ -40,13 +40,9 @@
                         <% } %> 
                         <div class="choose-avatar"
                         <% if (user.avatarUrl != null) { %> style='display:none' <% } %>>
-                            <div class="row g-3">
-                                <div class="col-md-auto">
-                                    <input type="file" name="avatar" id="InputAvatar" class="form-control" aria-describedby="mAvatarHelp">
-                                </div>
-                                <div class="col">
-                                    <input type="button" value="Clear" id="ClearAvatarInput" class="btn btn-danger">
-                                </div>
+                            <div class="input-group mb-2">
+                                <input type="file" name="avatar" id="InputAvatar" class="form-control" aria-describedby="mAvatarHelp">
+                                <input type="button" value="Clear" id="ClearAvatarInput" class="btn btn-danger">
                             </div>
                             <div id="mAvatarHelp" class="form-text">Only JPG, JPEG, PNG formats allowed. Maximum size: 5MB</div>
                         </div>
@@ -77,10 +73,16 @@
                         value="<%= typeof birthdate != 'undefined' ? new Date(birthdate).toISOString().split('T')[0] : new Date(user.birthdate).toISOString().split('T')[0] %>">
                     </div>
                     <!-- Phone -->
-                    <div class="col-sm mb-2">
+                    <div class="mb-2">
                         <label for="InputPhone" class="form-label">Phone</label>
-                        <input type="tel" class="form-control" id="InputPhone" name="phone" placeholder="Enter Phone" autocomplete="tel"
+                        <input type="tel" class="form-control" id="InputPhone" name="phone" placeholder="Enter Phone"
                         value="<%= typeof phone != 'undefined' ? phone : user.phone != null ? user.phone : '' %>">
+                    </div>
+                    <!-- Email -->
+                    <div class="mb-2">
+                        <label for="InputEMail" class="form-label">Email (*)</label>
+                        <input type="email" class="form-control" id="InputEMail" name="email" placeholder="Enter Email"
+                        value="<%= typeof email != 'undefined' ? email : user.email %>" required>
                     </div>
                     <!-- Confirm Password -->
                     <div class="mb-3">
@@ -153,6 +155,18 @@
                                 <% } %> 
                             </div>
                             <b>Email</b> <a href="mailto:<%= user.email %>"><%= user.email %></a>
+                        </div>
+                        <hr>
+                        <div class="row g-2">
+                            <div class="col-sm-auto">
+                                <a class="btn btn-success" title="Change Account's Password" href="/account/my-account/change-password">Change Password</a>
+                            </div>
+                        </div>
+                        <hr>
+                        <div>
+                            <form action="/account/logout?_m=DELETE" method="post">
+                                <button type="submit" class="btn btn-danger" title='Logout'>Logout</button>
+                            </form>
                         </div>
                     </span>
                 </fieldset>

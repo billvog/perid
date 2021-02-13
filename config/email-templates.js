@@ -36,7 +36,7 @@ div.wraper {
 div.wraper .title {
     font-size: 20pt;
     font-weight: bold;
-    margin-top: 0;
+    margin-top: 10px;
 }
 div.wraper span.full-link {
     word-break: break-all;
@@ -66,11 +66,12 @@ module.exports = {
                 <p>If you didn't logged in then someone else did. The best we can suggest you is to change your password immediately.</p>
                 <p>For any further help, you can contact <a href="mailto:support@perid.tk">support@perid.tk</a>.</p>
                 <p class="bottom-text">© ${year} BILLVOG, email sent from <a href="https://perid.tk" target="_blank" rel="noopener noreferrer">perid.tk</a><br>
-                You have received this email because a user logged in to your account. This email has been sent by a no-reply email account, any reply will be ignored.</p>
+                You received this email because a user logged in to your account. This email has been sent by a no-reply email account, any reply will be ignored.</p>
             </div>
         </body>
     </html>`
     },
+    // Authentication link
     AccountVerification: (UserFirstName, Url) => {
         return `<html>
         <header>
@@ -87,7 +88,7 @@ module.exports = {
                 <p>Click <a target="_blank" rel="noopener noreferrer" href="${Url}" class='link-button'>here</a> to verify your email address or follow this link:</p>
                 <p><span class="full-link"><a href="${Url}" target="_blank" rel="noopener noreferrer">${Url}</a></span></p>
                 <p class="bottom-text">© ${year} BILLVOG, email sent from <a href="https://perid.tk" target="_blank" rel="noopener noreferrer">perid.tk</a><br>
-                You have received this email because a user was registered in our service with this email. This email has been sent by a no-reply email account, any reply will be ignored.</p>
+                You received this email because a user was registered in our service with this email. This email has been sent by a no-reply email account, any reply will be ignored.</p>
             </div>
         </body>
     </html>`
@@ -108,7 +109,51 @@ module.exports = {
                 <p>Click <a target="_blank" rel="noopener noreferrer" href="${Url}" class='link-button'>here</a> to create a new password or follow this link:</p>
                 <p><span class="full-link"><a href="${Url}" target="_blank" rel="noopener noreferrer">${Url}</a></span></p>
                 <p class="bottom-text">© ${year} BILLVOG, email sent from <a href="https://perid.tk" target="_blank" rel="noopener noreferrer">perid.tk</a><br>
-                You have received this email because a password reset request for your account was triggered. This email has been sent by a no-reply email account, any reply will be ignored.</p>
+                You received this email because a password reset request for your account was triggered. This email has been sent by a no-reply email account, any reply will be ignored.</p>
+            </div>
+        </body>
+    </html>`
+    },
+    PasswordChange: (UserFirstName, Url) => {
+        return `<html>
+        <header>
+            <style>
+            ${styleSheet}
+            </style>
+        </header>
+        <body>
+            <div class="wraper">
+                <h2 class="title">Change your password for Perid</h2>
+                <p>Hey there <b>${UserFirstName}</b>,</p>
+                <p>Someone, or maybe you, has requested to change the password of your account at <a target='_blank' href='https://perid.tk/' class="perid-a">Perid</a>.</p>
+                <p>If you didn't triggered this action you can ignore this email.</p>
+                <p>Click <a target="_blank" rel="noopener noreferrer" href="${Url}" class='link-button'>here</a> to create a new password or follow this link:</p>
+                <p><span class="full-link"><a href="${Url}" target="_blank" rel="noopener noreferrer">${Url}</a></span></p>
+                <p class="bottom-text">© ${year} BILLVOG, email sent from <a href="https://perid.tk" target="_blank" rel="noopener noreferrer">perid.tk</a><br>
+                You received this email because a password change request for your account was triggered. This email has been sent by a no-reply email account, any reply will be ignored.</p>
+            </div>
+        </body>
+    </html>`
+    },
+    // Credentials has changed
+    EmailHasChanged: (UserFirstName, OldEmail, NewEmail) => {
+        return `<html>
+        <header>
+            <style>
+            ${styleSheet}
+            </style>
+        </header>
+        <body>
+            <div class="wraper">
+                <h2 class="title">Your account's email for Perid has changed</h2>
+                <p>Hey there <b>${UserFirstName}</b>,</p>
+                <p>Someone, or maybe you, has changed the email of your account at <a target='_blank' href='https://perid.tk/' class="perid-a">Perid</a>.</p>
+                <p>
+                    <s style='color:#DC3545'>${OldEmail}</s> → <b style='color:#8CC63F'>${NewEmail}</b>
+                </p>
+                <p>If you didn't triggered this action please contact us at <a href="mailto:support@perid.tk">support@perid.tk</a>.</p>
+                <p class="bottom-text">© ${year} BILLVOG, email sent from <a href="https://perid.tk" target="_blank" rel="noopener noreferrer">perid.tk</a><br>
+                You received this email because the email of your account was changed. This email has been sent by a no-reply email account, any reply will be ignored.</p>
             </div>
         </body>
     </html>`
@@ -127,7 +172,7 @@ module.exports = {
                 <p>Someone, or maybe you, has changed the password of your account at <a target='_blank' href='https://perid.tk/' class="perid-a">Perid</a>.</p>
                 <p>If you didn't triggered this action please contact us at <a href="mailto:support@perid.tk">support@perid.tk</a>.</p>
                 <p class="bottom-text">© ${year} BILLVOG, email sent from <a href="https://perid.tk" target="_blank" rel="noopener noreferrer">perid.tk</a><br>
-                You have received this email because the password of your account was changed. This email has been sent by a no-reply email account, any reply will be ignored.</p>
+                You reveived this email because the password of your account was changed. This email has been sent by a no-reply email account, any reply will be ignored.</p>
             </div>
         </body>
     </html>`

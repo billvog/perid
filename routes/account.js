@@ -72,7 +72,7 @@ router.post('/login', auth.ensureNotAuthenticated, (req, res, next) => {
 });
 
 // Logout page
-router.delete('/logout', auth.ensureAuthenticated, async (req, res) => {
+router.delete('/logout', auth.ensureAuthenticated, (req, res) => {
     // Delete session
     res.cookie('sessid', '', { maxAge: 0 });
 
@@ -83,7 +83,7 @@ router.delete('/logout', auth.ensureAuthenticated, async (req, res) => {
     res.redirect('/account/login');
 });
 
-// Forgot password page
+// Forgot password page (logged out)
 router.get('/forgot-password', auth.ensureNotAuthenticated, (req, res) => {
     res.render('account/forgot-password', {});
 });
@@ -128,6 +128,149 @@ router.post('/forgot-password', auth.ensureNotAuthenticated, async (req, res) =>
             // Input Fields
             email
         });
+    }
+});
+
+// Change password page (logged in)
+router.get('/my-account/change-password', auth.ensureAuthenticated, (req, res) => {
+    res.render('account/change-password', {
+        user: req.user
+    });
+});
+
+router.post('/my-account/change-password', auth.ensureAuthenticated, (req, res) => {
+    sendChangePasswordEmail(req.user, (error, info) => {
+        if (error) {
+            res.render('account/change-password', {
+                user: req.user,
+                errors: [{ message: error.message }],
+            });
+        }
+        else {
+            res.render('account/change-password', {
+                user: req.user,
+                success_msg: "Change password email has been sent (check spam folder)"
+            });
+        }
+    });
+});
+
+// Create new password page
+router.get('/my-account/create-new-password/:token', auth.ensureAuthenticated, (req, res) => {
+    const token = req.params.token;
+
+    // Check if token is valid
+    try {
+        jwt.verify(token, process.env.JWT_SECRET);
+    }
+    catch (error) {
+        return res.render('account/create-new-password', {
+            errors: [{ message: 'This token is not longer valid' }]
+        });
+    }
+    
+    res.render('account/create-new-password', {
+        user: req.user,
+        token
+    });
+});
+
+router.post('/my-account/create-new-password', auth.ensureAuthenticated, async (req, res) => {
+    const {
+        token,
+        password, passwordConfirm
+    } = req.body;
+    let errors = [];
+
+    // Check for empty fields
+    if (!token || !password || !passwordConfirm) {
+        errors.push({ message: 'Please fill all required fields' });
+    }
+
+    // Validate password
+    if (password.length < 6) {
+        errors.push({ message: 'Password must be at least 6 characters' });
+    }
+
+    // Check if passwords match
+    if (password && passwordConfirm && password !== passwordConfirm) {
+        errors.push({ message: 'Passwords do not match' });
+    }
+
+    if (errors.length > 0) {
+        return res.render('account/create-new-password', {
+            user: req.user,
+            errors,
+            // Input fields
+            token
+        });
+    }
+
+    try {
+        const {
+            user: id,
+            type
+        } = jwt.verify(token, process.env.JWT_SECRET);
+        
+        if (id == req.user.id && type == 'password-change-token') {
+            // Check if new password is different from old
+            if (bcrypt.compareSync(password, req.user.password)) {
+                return res.render('account/create-new-password', {
+                    user: req.user,
+                    errors: [{ message: 'Please create a new password that differs from your old one' }],
+                    // Input fields
+                    token
+                });
+            }
+
+            // Set password
+            bcrypt.hash(password, 10, async (error, hash) => {
+                if (error) throw error;
+
+                // Save user
+                req.user.password = hash;
+                await req.user.save();
+
+                // Send email to inform
+                mailer.sendMail({
+                    from: 'Perid <no-reply@perid.tk>',
+                    to: req.user.email,
+                    subject: "Your account's password has changed",
+                    html: emailTemplates.PasswordHasChanged(req.user.firstName)
+                }, (error, info) => {
+                    // console.log(info, error);
+                });
+
+                req.flash('success_msg', 'Your password has been changed');
+                return res.redirect('/account/my-account');
+            });
+        }
+        else {
+            return res.render('account/create-new-password', {
+                user: req.user,
+                errors: [{ message: "This token cannot be validated" }],
+                // Input fields
+                token
+            });
+        }
+    }
+    catch (error) {
+        if (error.name == 'TokenExpiredError') {
+            return res.render('account/create-new-password', {
+                user: req.user,
+                errors: [{ message: "This token has been expired" }],
+                // Input fields
+                token
+            });
+        }
+        else {
+            return res.render('account/create-new-password', {
+                user: req.user,
+                errors: [{ message: "This token cannot be validated" }],
+                // Input fields
+                token
+            });
+        }
     }
 });
 
@@ -210,7 +353,7 @@ router.post('/reset-password', auth.ensureNotAuthenticated, async (req, res) => 
                 mailer.sendMail({
                     from: 'Perid <no-reply@perid.tk>',
                     to: foundUser.email,
-                    subject: 'Your password for Perid has changed',
+                    subject: "Your account's password has changed",
                     html: emailTemplates.PasswordHasChanged(foundUser.firstName)
                 }, (error, info) => {
                     // console.log(info, error);
@@ -222,9 +365,10 @@ router.post('/reset-password', auth.ensureNotAuthenticated, async (req, res) => 
             });
         }
         else {
-            return res.render('account/verify-email', {
-                user: req.user || undefined,
-                errors: [{ message: "This token cannot be validated" }]
+            return res.render('account/reset-password', {
+                errors: [{ message: "This token cannot be validated" }],
+                // Input fields
+                token
             });
         }
     }
@@ -238,7 +382,7 @@ router.post('/reset-password', auth.ensureNotAuthenticated, async (req, res) => 
         }
         else {
             return res.render('account/reset-password', {
-                errors: [{ message: "Invalid token. Please try sending the email again." }],
+                errors: [{ message: "This token cannot be validated" }],
                 // Input fields
                 token
             });
@@ -505,13 +649,14 @@ router.post('/my-account/edit', auth.ensureAuthenticated, multer.single('avatar'
         firstName, middleName, lastName,
         birthdate,
         phone,
+        email,
         passwordConfirm
     } = req.body;
     let errors = [];
 
     try {
         // Check for empty fields
-        if (!firstName || !lastName || !birthdate || !passwordConfirm) {
+        if (!firstName || !lastName || !birthdate || !email || !passwordConfirm) {
             errors.push({ message: 'Please fill all the required fields' });
         }
 
@@ -530,6 +675,11 @@ router.post('/my-account/edit', auth.ensureAuthenticated, multer.single('avatar'
         // Validate phones
         if (phone && !phone.match('^[+]?[0-9]+$')) {
             errors.push({ message: 'Phone number is invalid' });
+        }
+
+        // Check if email is registered
+        if (email !== req.user.email && await User.findOne({ email: email }) != null) {
+            errors.push({ message: 'This email is already registered' });
         }
 
         // Match password
@@ -553,7 +703,8 @@ router.post('/my-account/edit', auth.ensureAuthenticated, multer.single('avatar'
                 // Input Fields
                 firstName, middleName, lastName,
                 birthdate: birthdate || undefined,
-                phone: phone || undefined
+                phone: phone || undefined,
+                email
             });
         }
 
@@ -592,6 +743,32 @@ router.post('/my-account/edit', auth.ensureAuthenticated, multer.single('avatar'
         req.user.lastName = lastName;
         req.user.birthdate = birthdate;
         req.user.phone = phone || null;
+
+        // Check if user changed email
+        if (req.user.email !== email) {
+            const OldEmail = req.user.email;
+
+            req.user.email = email;
+            req.user.verified = false;
+
+            // Inform user that the email has changed
+            mailer.sendMail({
+                from: 'Perid <no-reply@perid.tk>',
+                to: [
+                    OldEmail,
+                    req.user.email
+                ],
+                subject: "Your account's email has changed",
+                html: emailTemplates.EmailHasChanged(req.user.firstName, OldEmail, req.user.email)
+            }, (error, info) => {
+                // console.log(info, error);
+            });
+
+            // Send email to verify new email
+            sendEmailVerification(req.user, (error) => {
+                if (error) console.log(error);
+            });
+        }
     
         // Save modified user
         await req.user.save();
@@ -646,6 +823,33 @@ function sendPasswordResetEmail(user, callback) {
             to: user.email,
             subject: 'Password reset for Perid',
             html: emailTemplates.PasswordReset(user.firstName, `https://perid.tk/account/reset-password/${token}`)
+        }, (error, info) => {
+            // console.log(info, error);
+            
+            if (error) {
+                callback(error);
+            }
+            else {
+                callback(null, info);
+            }
+        });
+    });
+}
+
+function sendChangePasswordEmail(user, callback) {
+    jwt.sign({
+        user: user.id,
+        type: 'password-change-token'
+    }, process.env.JWT_SECRET, {
+        expiresIn: '10m'
+    }, (error, token) => {
+        if (error) return callback(error);
+        
+        mailer.sendMail({
+            from: 'Perid <no-reply@perid.tk>',
+            to: user.email,
+            subject: 'Change password for Perid',
+            html: emailTemplates.PasswordChange(user.firstName, `https://perid.tk/account/my-account/create-new-password/${token}`)
         }, (error, info) => {
             // console.log(info, error);
             
