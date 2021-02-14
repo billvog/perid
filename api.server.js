@@ -17,13 +17,21 @@ mongoose.connect(process.env.DB_URI, {
 const database = mongoose.connection;
 database.on('error', (error) => console.log(error));
 
+// Enable trust proxy
+app.set('trust proxy', 1);
+
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ limit: '5mb', extended: false }));
 app.use(rateLimit({
-    windowMs: 1 * 60 * 1000, // 1 hour
+    windowMs: 1 * 60 * 60 * 1000, // 1 hour
     max: 60, // limit each IP to 60 requests per windowMs
-    message: "Too many api requests, please try again after an hour"
+    handler: (req, res) => {
+        res.status(429).json({
+            error: true,
+            messge: 'Too many api requests, please try again after an hour'
+        });
+    }
 }));
 
 // Routes

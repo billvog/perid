@@ -6,6 +6,14 @@ const qrcode = require('qrcode');
 // User model
 const User = require('../models/User');
 
+// Test
+router.get('/test', (req, res) => {
+    res.status(200).json({
+        error: false,
+        message: "The API is up! 😀"
+    });
+})
+
 // Get one
 router.get('/:id', async (req, res) => {
     try {
