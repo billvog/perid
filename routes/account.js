@@ -176,7 +176,8 @@ router.get('/my-account/create-new-password/:token', auth.ensureAuthenticated, (
     }
     catch (error) {
         return res.render('account/create-new-password', {
-            errors: [{ message: 'This token is not longer valid' }]
+            errors: [{ message: 'This token is not longer valid' }],
+            token
         });
     }
     
@@ -186,36 +187,13 @@ router.get('/my-account/create-new-password/:token', auth.ensureAuthenticated, (
     });
 });
 
-router.post('/my-account/create-new-password', auth.ensureAuthenticated, async (req, res) => {
+router.post('/my-account/create-new-password/:token', auth.ensureAuthenticated, async (req, res) => {
     const {
-        token,
         password, passwordConfirm
     } = req.body;
     let errors = [];
 
-    // Check for empty fields
-    if (!token || !password || !passwordConfirm) {
-        errors.push({ message: 'Please fill all required fields' });
-    }
-
-    // Validate password
-    if (password.length < 6) {
-        errors.push({ message: 'Password must be at least 6 characters' });
-    }
-
-    // Check if passwords match
-    if (password && passwordConfirm && password !== passwordConfirm) {
-        errors.push({ message: 'Passwords do not match' });
-    }
-
-    if (errors.length > 0) {
-        return res.render('account/create-new-password', {
-            user: req.user,
-            errors,
-            // Input fields
-            token
-        });
-    }
+    const token = req.params.token;
 
     try {
         const {
@@ -224,6 +202,30 @@ router.post('/my-account/create-new-password', auth.ensureAuthenticated, async (
         } = jwt.verify(token, process.env.JWT_SECRET);
         
         if (id == req.user.id && type == 'password-change-token') {
+            // Check for empty fields
+            if (!password || !passwordConfirm) {
+                errors.push({ message: 'Please fill all required fields' });
+            }
+
+            // Validate password
+            if (password.length < 6) {
+                errors.push({ message: 'Password must be at least 6 characters' });
+            }
+
+            // Check if passwords match
+            if (password && passwordConfirm && password !== passwordConfirm) {
+                errors.push({ message: 'Passwords do not match' });
+            }
+
+            if (errors.length > 0) {
+                return res.render('account/create-new-password', {
+                    user: req.user,
+                    errors,
+                    // Input fields
+                    token
+                });
+            }
+
             // Check if new password is different from old
             if (bcrypt.compareSync(password, req.user.password)) {
                 return res.render('account/create-new-password', {
@@ -295,7 +297,8 @@ router.get('/reset-password/:token', auth.ensureNotAuthenticated, (req, res) => 
     }
     catch (error) {
         return res.render('account/reset-password', {
-            errors: [{ message: 'This token is not longer valid' }]
+            errors: [{ message: 'This token is not longer valid' }],
+            token
         });
     }
     
@@ -304,35 +307,13 @@ router.get('/reset-password/:token', auth.ensureNotAuthenticated, (req, res) => 
     });
 });
 
-router.post('/reset-password', auth.ensureNotAuthenticated, async (req, res) => {
+router.post('/reset-password/:token', auth.ensureNotAuthenticated, async (req, res) => {
     const {
-        token,
         password, passwordConfirm
     } = req.body;
     let errors = [];
 
-    // Check for empty fields
-    if (!token || !password || !passwordConfirm) {
-        errors.push({ message: 'Please fill all required fields' });
-    }
-
-    // Validate password
-    if (password.length < 6) {
-        errors.push({ message: 'Password must be at least 6 characters' });
-    }
-
-    // Check if passwords match
-    if (password && passwordConfirm && password !== passwordConfirm) {
-        errors.push({ message: 'Passwords do not match' });
-    }
-
-    if (errors.length > 0) {
-        return res.render('account/reset-password', {
-            errors,
-            // Input fields
-            token
-        });
-    }
+    const token = req.params.token;
 
     try {
         const {
@@ -341,6 +322,30 @@ router.post('/reset-password', auth.ensureNotAuthenticated, async (req, res) => 
         } = jwt.verify(token, process.env.JWT_SECRET);
         
         if (type == 'password-reset-token') {
+            // Check for empty fields
+            if (!password || !passwordConfirm) {
+                errors.push({ message: 'Please fill all required fields' });
+            }
+
+            // Validate password
+            if (password.length < 6) {
+                errors.push({ message: 'Password must be at least 6 characters' });
+            }
+
+            // Check if passwords match
+            if (password && passwordConfirm && password !== passwordConfirm) {
+                errors.push({ message: 'Passwords do not match' });
+            }
+
+            if (errors.length > 0) {
+                return res.render('account/reset-password', {
+                    errors,
+                    // Input fields
+                    token
+                });
+            }
+
+            // Find the user jwt reffers to
             const foundUser = await User.findOne({ _id: id });
 
             // Check if new password is different from old
@@ -406,59 +411,6 @@ router.get('/verify-email', auth.ensureAuthenticated, auth.ensureNotVerified, (r
     res.render('account/verify-email', {
         user: req.user
     });
-});
-
-// Handle account editing for unverified users
-router.post('/verify-email', auth.ensureAuthenticated, auth.ensureNotVerified, async (req, res) => {
-    const {
-        action
-    } = req.body;
-    let errors = [];
-
-    if (action == 'change-email') {
-        const {
-            email
-        } = req.body;
-
-        // Check for empty fields
-        if (!email) {
-            errors.push({ message: 'Please fill a valid email adress' });
-        }
-
-        // Check if the same email is used
-        if (email == req.user.email) {
-            errors.push({ message: 'This email is already is use by you' });
-        }
-        // Check if email is registered
-        else if (await User.findOne({ email: email }) != null) {
-            errors.push({ message: 'This email is already registered' });
-        }
-
-        if (errors.length > 0) {
-            return res.render('account/verify-email', {
-                user: req.user,
-                query: { prompt: 'change-email' },
-                errors,
-                // Input Fields
-                email
-            });
-        }
-
-        req.user.email = email;
-
-        // Save modified user
-        req.user.save()
-        .then(() => {
-            req.flash('success_msg', 'Your email has been changed');
-            res.redirect('/account/verify-email');
-        })
-        .catch((error) => {
-            console.log(error);
-        });
-    }
-    else {
-        res.sendStatus(400);
-    }
 });
 
 // Handle email verification
