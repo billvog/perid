@@ -10,6 +10,14 @@ body {
 a {
     color:gold;
 }
+.ls-title {
+    color: gold;
+    font-weight: bold;
+}
+.li-title {
+    color: cadetblue;
+    font-weight: bold;
+}
 .perid-a {
     color: cadetblue;
     font-weight: bold;
@@ -51,7 +59,7 @@ div.wraper p.bottom-text {
 }`;
 
 module.exports = {
-    AccountLoggedIn: (UserFirstName) => {
+    AccountLoggedIn: (UserFirstName, Geolocation, Device) => {
         return `<html>
         <header>
             <style>
@@ -63,7 +71,13 @@ module.exports = {
                 <h2 class="title">Someone has logged in to your Perid account</h2>
                 <p>Hey there <b>${UserFirstName}</b>,</p>
                 <p>Someone, or maybe you, has logged in to your account at <a target='_blank' href='https://perid.tk/' class="perid-a">Perid</a>.</p>
-                <p>If you didn't logged in then someone else did. The best we can suggest you is to change your password immediately.</p>
+                <p>If you didn't logged in, then someone else did. The best we can suggest you is to change your password immediately.</p>
+                <p>
+                    <span class='ls-title'>More Information ⤵</span><br>
+                    <span class='li-title'>IP</span> ${Geolocation.ip}<br>
+                    <span class='li-title'>Location</span> ${Geolocation.city}, ${Geolocation.location.country_flag_emoji} ${Geolocation.country_name}<br>
+                    <span class='li-title'>Platform</span> ${Device.platform}, ${Device.os}
+                </p>
                 <p>For any further help, you can contact <a href="mailto:support@perid.tk">support@perid.tk</a>.</p>
                 <p class="bottom-text">© ${year} BILLVOG, email sent from <a href="https://perid.tk" target="_blank" rel="noopener noreferrer">perid.tk</a><br>
                 You received this email because a user logged in to your account. This email has been sent by a no-reply email account, any reply will be ignored.</p>

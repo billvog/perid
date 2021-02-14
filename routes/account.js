@@ -5,6 +5,8 @@ const bcrypt = require('bcrypt');
 const passport = require('passport');
 const auth = require('../config/auth');
 const jwt = require('jsonwebtoken');
+const useragent = require('express-useragent');
+const request = require('request');
 
 // Custom config
 const mailer = require('../config/nodemailer');
@@ -42,13 +44,22 @@ router.post('/login', auth.ensureNotAuthenticated, (req, res, next) => {
         req.login(user, async (error) => {
             if (error) return next(error);
 
-            mailer.sendMail({
-                from: 'Perid <no-reply@perid.tk>',
-                to: user.email,
-                subject: 'Someone logged in to your account at Perid',
-                html: emailTemplates.AccountLoggedIn(user.firstName)
-            }, (error, info) => {
-                // console.log(info, error);
+            const IP = req.headers["x-forwarded-for"];
+            const DeviceInfo = useragent.parse(req.headers['user-agent']);
+
+            request(`http://api.ipstack.com/${IP}?access_key=${process.env.IPSTACK_API}`, {
+                json: true
+            }, (error, response, body) => {
+                if (error) console.log(error);
+                
+                mailer.sendMail({
+                    from: 'Perid <no-reply@perid.tk>',
+                    to: user.email,
+                    subject: 'Someone logged in to your account at Perid',
+                    html: emailTemplates.AccountLoggedIn(user.firstName, body, DeviceInfo)
+                }, (error, info) => {
+                    // console.log(info, error);
+                });
             });
 
             // Create new session

@@ -21,7 +21,10 @@ mongoose.connect(process.env.LOCAL_DB_URI, {
 const database = mongoose.connection;
 database.on('error', (error) => console.log(error));
 
+// Set view engine
 app.set('view engine', 'ejs');
+// Set trust proxt
+app.set('trust proxy', true);
 
 // Middleware
 app.use(express.static(path.join(__dirname, 'public')))
