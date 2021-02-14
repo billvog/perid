@@ -4,6 +4,7 @@ const path = require('path');
 const express = require('express');
 const mongoose = require('mongoose');
 const passport = require('passport');
+const auth = require('./config/auth');
 
 const app = express();
 
@@ -54,6 +55,7 @@ app.use((req, res, next) => {
 // Routes
 app.use('/', require('./routes/index'));
 app.use('/account', require('./routes/account'));
+app.use('/dashboard', auth.ensureAuthenticated, auth.ensureVerified, require('./routes/dashboard'));
 app.use('/docs', require('./routes/docs'));
 // 403 Error
 app.use('/public/*', (req, res) => {

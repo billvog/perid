@@ -18,9 +18,8 @@
     <link rel="stylesheet" href="/css/user-preview.css">
 </head>
 <body>
-    <div class="container">
+    <div class="content-container container">
         <%- include('../partials/header') %> 
-
         <div class="wraper">
             <% if (EditAccount) { %>
                 <form id="edit-account-form" class="validate-u-form" action="/account/my-account/edit" method="POST" enctype="multipart/form-data">
@@ -153,6 +152,12 @@
                                 <i>No phone provided</i>
                             <% } %> 
                             <b>Email</b> <a href="mailto:<%= user.email %>"><%= user.email %></a>
+                        </div>
+                        <hr>
+                        <div class="row mb-2">
+                            <div class="col-sm-auto">
+                                <a class="btn btn-success btn-sm" title="Visit My Dashboard" href="/dashboard">My Dashboard</a>
+                            </div>
                         </div>
                         <hr>
                         <div class="row g-2">

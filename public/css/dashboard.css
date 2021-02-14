@@ -1,0 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap');
+
+.wraper button, .wraper input {
+    font-family: 'Roboto Mono', monospace;
+}
+
+.badge {
+    font-size: 10pt;
+}

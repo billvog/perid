@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 const qrcode = require('qrcode');
 
-// User model
+// Models
 const User = require('../models/User');
 
 // Test
