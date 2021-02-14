@@ -713,6 +713,11 @@ express-flash@0.0.2:
   dependencies:
     connect-flash "0.1.x"
 
+express-rate-limit@^5.2.5:
+  version "5.2.5"
+  resolved "https://registry.yarnpkg.com/express-rate-limit/-/express-rate-limit-5.2.5.tgz#956fde02aaf28724c0fd01b932986baa35143ece"
+  integrity sha512-fv9mf4hWRKZHVlY8ChVNYnGxa49m0zQ6CrJxNiXe2IjJPqicrqoA/JOyBbvs4ufSSLZ6NTzhtgEyLcdfbe+Q6Q==
+
 express-session@^1.17.1:
   version "1.17.1"
   resolved "https://registry.yarnpkg.com/express-session/-/express-session-1.17.1.tgz#36ecbc7034566d38c8509885c044d461c11bf357"

@@ -11,7 +11,7 @@ const app = express();
 require('./config/passport')(passport);
 
 // Connect to DB
-mongoose.connect(process.env.LOCAL_DB_URI, {
+mongoose.connect(process.env.DB_URI, {
     useNewUrlParser: true,
     useCreateIndex: true,
     useUnifiedTopology: true,
@@ -28,7 +28,6 @@ app.set('trust proxy', true);
 
 // Middleware
 app.use(express.static(path.join(__dirname, 'public')))
-app.use(express.json());
 app.use(express.urlencoded({ limit: '5mb', extended: false }));
 app.use(require('method-override')('_m'));
 app.use(require('express-flash')());
@@ -55,7 +54,6 @@ app.use((req, res, next) => {
 // Routes
 app.use('/', require('./routes/index'));
 app.use('/account', require('./routes/account'));
-app.use('/api', require('./routes/api'));
 app.use('/docs', require('./routes/docs'));
 // 403 Error
 app.use('/public/*', (req, res) => {

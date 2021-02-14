@@ -9,6 +9,16 @@ nav.navbar {
     -moz-user-select: none;
 }
 
+li.nav-item.logout-menu-item form {
+    transform: translateY(5px);
+}
+
+@media only screen and (max-width: 991px) {
+    li.nav-item.logout-menu-item {
+        display: none;
+    }
+}
+
 p:last-child {
     margin-bottom: 0;
 }

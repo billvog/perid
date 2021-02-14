@@ -157,14 +157,13 @@
                         <hr>
                         <div class="row g-2">
                             <div class="col-sm-auto">
-                                <a class="btn btn-success" title="Change Account's Password" href="/account/my-account/change-password">Change Password</a>
+                                <a class="btn btn-primary btn-sm" title="Change Account's Password" href="/account/my-account/change-password">Change Password</a>
                             </div>
-                        </div>
-                        <hr>
-                        <div>
-                            <form action="/account/logout?_m=DELETE" method="post">
-                                <button type="submit" class="btn btn-danger" title='Logout'>Logout</button>
-                            </form>
+                            <div class="col-sm-auto">
+                                <form action="/account/logout?_m=DELETE" method="post">
+                                    <button type="submit" class="btn btn-danger btn-sm" title='Logout'>Logout</button>
+                                </form>
+                            </div>
                         </div>
                     </span>
                 </fieldset>

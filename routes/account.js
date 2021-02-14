@@ -55,7 +55,7 @@ router.post('/login', auth.ensureNotAuthenticated, (req, res, next) => {
                 mailer.sendMail({
                     from: 'Perid <no-reply@perid.tk>',
                     to: user.email,
-                    subject: 'Someone logged in to your account at Perid',
+                    subject: 'Someone logged into your account',
                     html: emailTemplates.AccountLoggedIn(user.firstName, body, DeviceInfo)
                 }, (error, info) => {
                     // console.log(info, error);

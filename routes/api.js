@@ -1,12 +1,10 @@
 const fs = require('fs');
-const http = require("http");
 const express = require('express');
 const router = express.Router();
 const qrcode = require('qrcode');
 
 // User model
 const User = require('../models/User');
-const { response } = require('express');
 
 // Get one
 router.get('/:id', async (req, res) => {

@@ -35,10 +35,11 @@
                 <legend>API Documention</legend>
                 <p>
                     Perid also provides an API that you can use in your app to find a user registered is our databases. <br>
-                    The usage of it is fairly simple;
+                    Every IP is limited to make 60 requests per hour. If you exceed this limit, you'll need to wait 1 hour to make a new request. <br>
+                    The usage of the api is fairly simple;
                     <h5>> Get user by ID</h5>
                     <p>
-                        Getting a user by ID requires a GET request @ <code>https://perid.tk/api/[pid]</code>
+                        Getting a user by ID requires a GET request @ <code>https://api.perid.tk/[pid]</code>
                         where [pid] is the ID of the user you want to search
                     </p>
                     <p>
@@ -68,12 +69,12 @@
                     <br>
                     <h5>> Get user Avatar or Qr</h5>
                     <p>
-                        If you want to get user's avatar or QR make a GET request @ <code>https://perid.tk/api/[pid]/avatar</code> or <code>https://perid.tk/api/[pid]/qr</code> 
+                        If you want to get user's avatar or QR make a GET request @ <code>https://api.perid.tk/[pid]/avatar</code> or <code>https://api.perid.tk/[pid]/qr</code> 
                         where [pid] is the ID of the user you want to search
                     </p>
 
                     In this case API returns an image buffer (if succeed).<br>
-                    If the API fails, for some reason to retrieve the image from the server, it will return an <code>500 Internal Server</code> error. <br>
+                    If the API fails, for some reason to retrieve the image from the server, it will return an <code>500 Internal Server Error</code>. <br>
                     If the provided ID doesn't match to any in the database then it will respond with a <code>404 Not Found</code> error.
                 </p>
             </fieldset>
