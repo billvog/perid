@@ -25,13 +25,3 @@
 .user-info-wraper {
     display: block;
 }
-
-.user-info-wraper div.phone-numbers-group {
-    border-left: 3px solid #8CC63F;
-    padding: 4px 8px;
-    margin: 7px 0;
-}
-
-.alert .user-info-wraper div.phone-numbers-group {
-    border-color: hsl(152, 85%, 30%);
-}

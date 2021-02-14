@@ -146,14 +146,12 @@
                             <b>ID</b> <%= user.id %><br>
                             <b>Full Name</b> <%= user.firstName %> <%= user.middleName %> <%= user.lastName %><br>
                             <b>Birthdate</b> <%= new Date(user.birthdate).toLocaleString().split(',')[0] %><br>
-                            <div class="phone-numbers-group">
-                                <% if (user.phone != null) { %> 
-                                    <!-- Phone -->
-                                    <b>Phone</b> <a href="tel:<%= user.phone %>"><%= user.phone %></a><br>
-                                <% } else { %> 
-                                    <i>No phone provided</i>
-                                <% } %> 
-                            </div>
+                            <% if (user.phone != null) { %> 
+                                <!-- Phone -->
+                                <b>Phone</b> <a href="tel:<%= user.phone %>"><%= user.phone %></a><br>
+                            <% } else { %> 
+                                <i>No phone provided</i>
+                            <% } %> 
                             <b>Email</b> <a href="mailto:<%= user.email %>"><%= user.email %></a>
                         </div>
                         <hr>
