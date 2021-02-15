@@ -35,10 +35,20 @@
                 <legend>API Documention</legend>
                 <p>
                     Perid also provides an API that you can use in your app to find a user registered is our databases. <br>
-                    Every IP is limited to make 60 requests per hour. If you exceed this limit, you'll have to wait 1 hour to make a new request. <br>
-                    <h5>> Get user by ID</h5>
+                    The base url of the API is <code>https://api.perid.tk/[api-access-key]/</code> where [api-access-key] is your API access key. <br>
+                    To quickly check if the API is wokring make a request to <code>https://api.perid.tk/[api-access-key]/test</code> using your API key.
+                    <h5>→ Limits</h5>
                     <p>
-                        Getting a user by ID requires a GET request @ <code>https://api.perid.tk/[pid]</code>
+                        Every IP is limited to make 15 requests per minute. This happens to prevent spamming requests. <br>
+                        Additionaly, a basic API access key can make up to 1,000 requests per month. You can view how many requests you have left in your <a href="/dashboard">dashboard</a>.
+                    </p>
+                    <p>
+                        To get yourself an API access key you need to <a href="/account/register">create an account at Perid</a>. That requires not payment. <br>
+                        In case you have already an account, but you don't have an access key please contact us at <a href="mailto:support@perid.tk">support@perid.tk</a>.
+                    </p>
+                    <h5>→ Get user by ID</h5>
+                    <p>
+                        Getting a user by ID requires a GET request @ <code>https://api.perid.tk/[api-access-key]/[pid]</code>
                         where [pid] is the ID of the user you want to search
                     </p>
                     <p>
@@ -66,9 +76,9 @@
                         </code>
                     </div>
                     <br>
-                    <h5>> Get user Avatar or Qr</h5>
+                    <h5>→ Get user Avatar or Qr (by ID)</h5>
                     <p>
-                        If you want to get user's avatar or QR make a GET request @ <code>https://api.perid.tk/[pid]/avatar</code> or <code>https://api.perid.tk/[pid]/qr</code> 
+                        If you want to get user's avatar or QR make a GET request @ <code>https://api.perid.tk/[api-access-key]/[pid]/avatar</code> or <code>https://api.perid.tk/[api-access-key]/[pid]/qr</code> 
                         where [pid] is the ID of the user you want to search
                     </p>
 

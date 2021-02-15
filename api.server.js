@@ -30,7 +30,7 @@ app.use(express.json());
 app.use(express.urlencoded({ limit: '5mb', extended: false }));
 app.use(rateLimit({
     windowMs: 1 * 60 * 1000, // 1 minute
-    max: 10, // limit each IP to 10 requests per windowMs
+    max: 15, // limit each IP to 10 requests per windowMs
     handler: (req, res) => {
         res.status(429).json({
             error: true,
