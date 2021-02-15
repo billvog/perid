@@ -142,16 +142,26 @@
                             <% } %> 
                         </div>
                         <div class="user-info-wraper">
-                            <b>ID</b> <%= user.id %><br>
-                            <b>Full Name</b> <%= user.firstName %> <%= user.middleName %> <%= user.lastName %><br>
-                            <b>Birthdate</b> <%= new Date(user.birthdate).toLocaleString().split(',')[0] %><br>
-                            <% if (user.phone != null) { %> 
-                                <!-- Phone -->
-                                <b>Phone</b> <a href="tel:<%= user.phone %>"><%= user.phone %></a><br>
-                            <% } else { %> 
-                                <i>No phone provided</i>
-                            <% } %> 
-                            <b>Email</b> <a href="mailto:<%= user.email %>"><%= user.email %></a>
+                            <div class="mb-1">
+                                <b>ID</b> <%= user.id %>
+                            </div>
+                            <div class="mb-1">
+                                <b>Full Name</b> <%= user.firstName %> <%= user.middleName %> <%= user.lastName %>
+                            </div>
+                            <div class="mb-1">
+                                <b>Birthdate</b> <%= new Date(user.birthdate).toLocaleString().split(',')[0] %>
+                            </div>
+                            <div class="mb-1">
+                                <% if (user.phone != null) { %> 
+                                    <!-- Phone -->
+                                    <b>Phone</b> <a href="tel:<%= user.phone %>"><%= user.phone %></a>
+                                <% } else { %> 
+                                    <b>Phone</b> <span class="badge bg-primary">No phone provided</span>
+                                <% } %> 
+                            </div>
+                            <div class="mb-1">
+                                <b>Email</b> <a href="mailto:<%= user.email %>"><%= user.email %></a>
+                            </div>
                         </div>
                         <hr>
                         <div class="row mb-2">

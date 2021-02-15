@@ -18,7 +18,7 @@
     <div class="content-container container">
         <%- include('../partials/header') %> 
         <div class="wraper">
-            <h3>Dashboard</h3>
+            <h3><%= user.firstName %>'s Dashboard</h3>
             <p>
                 Here you can monitor your API usage and manage your API keys. <br>
                 Learn how to use the API <a href="/docs/">here</a>.
@@ -28,7 +28,7 @@
                 <div>
                     No API keys found registered on your account.
                     <div class="mt-2">
-                        <button class="btn btn-sm btn-primary" onclick="window.location='/dashboard/create-api-key'">
+                        <button class="btn btn-sm btn-primary mono-font" onclick="window.location='/dashboard/create-api-key'">
                             <i class="fas fa-key"></i> Create your first API access key
                         </button>
                     </div>
@@ -39,34 +39,58 @@
                     <legend>Information</legend>
                     <div class="mb-3">
                         <label class="form-label"><i class="fas fa-user"></i> Owner ID</label>
-                        <input class="form-control" type="text" value="<%= ApiKey.ownerId %>" disabled='true'>
+                        <input class="form-control  " type="text" value="<%= ApiKey.ownerId %>" disabled='true'>
                     </div>
                     <div class="mb-1">
                         <label class="form-label"><i class="fas fa-key"></i> Your API Access Key</label>
-                        <form action="/dashboard/reset-api-key" method="POST">
-                            <div class="input-group">
-                                <input class="form-control" type="text" value="<%= ApiKey.key %>" disabled='true'>
-                                <button type="submit" class="btn btn-sm btn-primary" title="Reset your API key" aria-describedby="resetHelpBlock">Reset</button>
-                            </div>
-                        </form>
+                        <div class="input-group api-info-group">
+                            <input class="form-control mono-font" type="text" value="<%= ApiKey.key %>" disabled='true'>
+                            <button type="submit" class="btn btn-sm btn-primary" title="Reset your API key" aria-describedby="resetHelpBlock"
+                            data-bs-toggle="modal" data-bs-target="#resetApiKeyModal">Reset</button>
+                        </div>
                         <div id="resetHelpBlock" class="form-text">
-                            Reset your API access key in case of it being exposed to 3rd parties
+                            This key is secret, do not share it with 3rd parties. In case of it being exposed you can reset it.
                         </div>
                     </div>
                 </fieldset>
                 <fieldset>
                     <legend>Monitor</legend>
                     <!-- API Usage -->
-                    <div class="input-group mb-1">
-                        <span class="badge bg-secondary">API Usage (monthly)</span>
-                        <span class="badge bg-primary">
-                            <span id="req_percent"><%= ((ApiKey.doneRequests / ApiKey.totalRequests) * 100).toFixed(1) %></span>% (<span id="req_done"><%= ApiKey.doneRequests.toLocaleString() %></span> / <span id="req_total"><%= ApiKey.totalRequests.toLocaleString() %></span>)
-                        </span>
+                    <div class="mb-1 api-mon-usage-group">
+                        <div class="mb-2 group-title">
+                            <i class="fas fa-chart-area"></i> API Usage <span class="light-text">(monthly)</span>
+                        </div>
+                        <div class="mb-0 group-content">
+                            <span id="req_percent"><%= ((ApiKey.doneRequests / ApiKey.totalRequests) * 100).toFixed(1) %></span>% 
+                            (<span id="req_done"><%= ApiKey.doneRequests.toLocaleString() %></span> / <span id="req_total"><%= ApiKey.totalRequests.toLocaleString() %></span>)
+                        </div>
                     </div>
                 </fieldset>
             <% } %>
         </div>
     </div>
+    <% if (typeof ApiKey != 'undefined') { %> 
+    <!-- Reset API key Confirm -->
+    <div class="modal fade" id="resetApiKeyModal" tabindex="-1" aria-labelledby="resetApiKeyModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h5 class="modal-title" id="resetApiKeyModalLabel">Confirm</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to reset your API access key?
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <form action="/dashboard/reset-api-key" id="reset-api-key-form" method="POST">
+                <button type="submit" class="btn btn-primary">Reset</button>
+            </form>
+            </div>
+        </div>
+        </div>
+    </div>
+    <% } %> 
 </body>
 <!-- Bootstrap -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>

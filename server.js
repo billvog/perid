@@ -43,7 +43,8 @@ if (process.env.NODE_ENV == 'production') {
             directives: {
               ...helmet.contentSecurityPolicy.getDefaultDirectives(),
               "img-src": ["'self'", "data:", "res.cloudinary.com"],
-              "script-src": ["'self'", "ajax.googleapis.com", "cdn.jsdelivr.net"]
+              "script-src": ["'self'", "'unsafe-inline'", "ajax.googleapis.com", "cdn.jsdelivr.net"],
+              "script-src-attr": ["'unsafe-inline'"]
             },
           },
     }));

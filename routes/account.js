@@ -176,6 +176,7 @@ router.get('/my-account/create-new-password/:token', auth.ensureAuthenticated, (
     }
     catch (error) {
         return res.render('account/create-new-password', {
+            user: req.user,
             errors: [{ message: 'This token is not longer valid' }],
             token
         });
@@ -523,9 +524,19 @@ router.post('/register', auth.ensureNotAuthenticated, multer.single('avatar'), a
             errors.push({ message: 'This email is already registered' });
         }
 
+        // Ensure age is more than 13
+        if (new Date().getFullYear() - new Date(Date.parse(birthdate)).getFullYear() <= 13) {
+            errors = [];
+            errors.push({ message: 'To create an account to Perid, you must be over 13 years old.' });
+        }
+
         if (errors.length > 0) {
-            // Remove uploaded image from temp
-            fs.rm(`tmp/user-avatars/${req.user.id}`, (err) => { if (err) throw err });
+            // // Remove uploaded image from tmp
+            if (avatar && fs.existsSync(avatar.path)) {
+                fs.unlink(avatar.path, (error) => {
+                    if (error) console.log(error);
+                });
+            }
 
             return res.render('account/register', {
                 errors,
@@ -546,17 +557,17 @@ router.post('/register', auth.ensureNotAuthenticated, multer.single('avatar'), a
         });
 
         // Set Avatar
-        if (avatar && fs.existsSync(`tmp/user-avatars/${req.user.id}`)) {
+        if (avatar && fs.existsSync(avatar.path)) {
             // Upload to cloud
-            const uploadRes = await cloudinary.uploader.upload(`tmp/user-avatars/${req.user.id}`, {
+            const uploadRes = await cloudinary.uploader.upload(avatar.path, {
                 resource_type: 'image',
-                public_id: `users/avatars/${req.user.id}`,
+                public_id: `users/avatars/${NewUser.id}`,
                 overwrite: true,
                 // Upload as 256x256
                 transformation: [{ width: 256, height: 256, gravity: 'face', crop: 'fill' }]
             }, (error) => {
                 // Remove uploaded image from temp
-                fs.rm(`tmp/user-avatars/${req.user.id}`, (err) => { if (err) throw err });
+                fs.rm(avatar.path, (err) => { if (err) throw err });
                 if (error) throw error;
             });
 
@@ -651,10 +662,16 @@ router.post('/my-account/edit', auth.ensureAuthenticated, multer.single('avatar'
             errors.push({ message: 'Password is incorrect' });
         }
 
+        // Ensure age is more than 13
+        if (new Date().getFullYear() - new Date(Date.parse(birthdate)).getFullYear() <= 13) {
+            errors = [];
+            errors.push({ message: 'To create an account to Perid, you must be over 13 years old.' });
+        }
+
         if (errors.length > 0) {
             // Remove uploaded image from tmp
-            if (fs.existsSync(`tmp/user-avatars/${req.user.id}`)) {
-                fs.unlink(`tmp/user-avatars/${req.user.id}`, (error) => {
+            if (avatar && fs.existsSync(avatar.path)) {
+                fs.unlink(avatar.path, (error) => {
                     if (error) console.log(error);
                 });
             }
@@ -672,9 +689,9 @@ router.post('/my-account/edit', auth.ensureAuthenticated, multer.single('avatar'
         }
 
         // Update avatar
-        if (avatar && fs.existsSync(`tmp/user-avatars/${req.user.id}`)) {
+        if (avatar && fs.existsSync(avatar.path)) {
             // Upload to cloud
-            const uploadRes = await cloudinary.uploader.upload(`tmp/user-avatars/${req.user.id}`, {
+            const uploadRes = await cloudinary.uploader.upload(avatar.path, {
                 resource_type: 'image',
                 public_id: `users/avatars/${req.user.id}`,
                 overwrite: true,
@@ -682,7 +699,7 @@ router.post('/my-account/edit', auth.ensureAuthenticated, multer.single('avatar'
                 transformation: [{ width: 256, height: 256, gravity: 'face', crop: 'fill' }]
             }, (error) => {
                 // Remove uploaded image from temp
-                fs.unlink(`tmp/user-avatars/${req.user.id}`, (error) => {
+                fs.unlink(avatar.path, (error) => {
                     if (error) console.log(error);
                 });
                 

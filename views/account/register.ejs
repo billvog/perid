@@ -19,7 +19,7 @@
         <%- include('../partials/header') %> 
 
         <div class="wraper">
-            <form id="create-pid-form" class="validate-u-form" action="/account/register" method="POST" autocomplete="off">
+            <form id="create-pid-form" class="validate-u-form" action="/account/register" method="POST" enctype="multipart/form-data" autocomplete="off">
                 <%- include('../partials/form-messages') %>
                 <!-- Avatar -->
                 <div class="mb-3">
@@ -80,6 +80,11 @@
                 </span>
                 <div class="form-bottom-text f-right">
                     (*) are required fields
+                </div>
+                <div class="form-text" style="margin-top: 15px;">
+                    <div>
+                        Clicking the "Register" button requires you to agree the <a href="/docs/tos">Terms of Services (TOS)</a>.
+                    </div>
                 </div>
             </form>
         </div>

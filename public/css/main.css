@@ -20,6 +20,10 @@ li.nav-item.logout-menu-item form {
     }
 }
 
+.light-text {
+    font-weight: lighter;
+}
+
 p:last-child {
     margin-bottom: 0;
 }
