@@ -4,6 +4,7 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
 
 const app = express();
 
@@ -11,7 +12,11 @@ const app = express();
 const ApiKey = require('./models/ApiKey');
 
 // Connect to DB
-mongoose.connect(process.env.DB_URI, {
+var dbConnectionString;
+if (process.env.NODE_ENV == 'production') dbConnectionString = process.env.DB_URI;
+else dbConnectionString = process.env.LOCAL_DB_URI;
+
+mongoose.connect(dbConnectionString, {
     useNewUrlParser: true,
     useCreateIndex: true,
     useUnifiedTopology: true,
@@ -23,6 +28,11 @@ database.on('error', (error) => console.log(error));
 
 // Enable trust proxy
 app.set('trust proxy', 1);
+
+// Production Middleware
+if (process.env.NODE_ENV == 'production') {
+    app.use(helmet());
+}
 
 // Middleware
 app.use('/favicon.ico', express.static('public/assets/PeridIcon.svg'));

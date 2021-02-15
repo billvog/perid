@@ -8,7 +8,11 @@ const Agenda = require('agenda');
 const ApiKey = require('./models/ApiKey');
 
 // Connect to DB
-mongoose.connect(process.env.DB_URI, {
+var dbConnectionString;
+if (process.env.NODE_ENV == 'production') dbConnectionString = process.env.DB_URI;
+else dbConnectionString = process.env.LOCAL_DB_URI;
+
+mongoose.connect(dbConnectionString, {
     useNewUrlParser: true,
     useCreateIndex: true,
     useUnifiedTopology: true,

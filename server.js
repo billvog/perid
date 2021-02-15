@@ -4,9 +4,11 @@ require('dotenv').config();
 const path = require('path');
 const express = require('express');
 const mongoose = require('mongoose');
-const passport = require('passport');
 const auth = require('./config/auth');
+const passport = require('passport');
 const rateLimit = require('express-rate-limit');
+const compression = require('compression');
+const helmet = require('helmet');
 
 const app = express();
 
@@ -14,7 +16,11 @@ const app = express();
 require('./config/passport')(passport);
 
 // Connect to DB
-mongoose.connect(process.env.LOCAL_DB_URI, {
+var dbConnectionString;
+if (process.env.NODE_ENV == 'production') dbConnectionString = process.env.DB_URI;
+else dbConnectionString = process.env.LOCAL_DB_URI;
+
+mongoose.connect(dbConnectionString, {
     useNewUrlParser: true,
     useCreateIndex: true,
     useUnifiedTopology: true,
@@ -28,6 +34,20 @@ database.on('error', (error) => console.log(error));
 app.set('view engine', 'ejs');
 // Set trust proxt
 app.set('trust proxy', true);
+
+// Production Middleware
+if (process.env.NODE_ENV == 'production') {
+    app.use(compression());
+    app.use(helmet({
+        contentSecurityPolicy: {
+            directives: {
+              ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+              "img-src": ["'self'", "data:", "res.cloudinary.com"],
+              "script-src": ["'self'", "ajax.googleapis.com", "cdn.jsdelivr.net"]
+            },
+          },
+    }));
+}
 
 // Middleware
 app.use(express.static(path.join(__dirname, 'public')))
