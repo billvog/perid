@@ -10,7 +10,7 @@ const User = require('../models/User');
 router.get('/test', (req, res) => {
     res.status(200).json({
         error: false,
-        message: "The API is up! 😀"
+        message: "The API is up!"
     });
 })
 

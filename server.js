@@ -1,3 +1,4 @@
+// .env
 require('dotenv').config();
 
 const path = require('path');
@@ -5,6 +6,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const passport = require('passport');
 const auth = require('./config/auth');
+const rateLimit = require('express-rate-limit');
 
 const app = express();
 
@@ -12,7 +14,7 @@ const app = express();
 require('./config/passport')(passport);
 
 // Connect to DB
-mongoose.connect(process.env.DB_URI, {
+mongoose.connect(process.env.LOCAL_DB_URI, {
     useNewUrlParser: true,
     useCreateIndex: true,
     useUnifiedTopology: true,
@@ -40,6 +42,16 @@ app.use(require('express-session')({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
+// Limit requests
+app.use(rateLimit({
+    windowMs: 1 * 60 * 1000,
+    max: 15,
+    handler: (req, res) => {
+        res.status(429).render('errors/429', {
+            user: req.user || undefined
+        });
+    }
+}));
 
 // Session Manager Middleware
 app.use(require('./config/session-manager'));
@@ -66,6 +78,7 @@ app.use((req, res) => {
     res.status(404).render('errors/404', { user: req.user || undefined });
 });
 
+// Start server @ 5000
 const PORT = 5000;
 app.listen(PORT, () => {
     console.log(`Starting at port: ${PORT}`);

@@ -1,9 +1,9 @@
+// .env
 require('dotenv').config();
 
 const express = require('express');
 const mongoose = require('mongoose');
 const rateLimit = require('express-rate-limit');
-const agenda = require('agenda');
 
 const app = express();
 
@@ -27,14 +27,13 @@ app.set('trust proxy', 1);
 // Middleware
 app.use('/favicon.ico', express.static('public/assets/PeridIcon.svg'));
 app.use(express.json());
-app.use(express.urlencoded({ limit: '5mb', extended: false }));
 app.use(rateLimit({
-    windowMs: 1 * 60 * 1000, // 1 minute
-    max: 15, // limit each IP to 10 requests per windowMs
+    windowMs: 1 * 60 * 1000,
+    max: 30,
     handler: (req, res) => {
         res.status(429).json({
             error: true,
-            messge: 'Too many API requests, please try again after an hour'
+            messge: 'Too many API requests from this IP, slow down.'
         });
     }
 }));
@@ -55,7 +54,7 @@ app.use('/:apiKey/', async (req, res, next) => {
     if (apiKey.doneRequests >= apiKey.totalRequests) {
         return res.status(401).json({
             error: true,
-            message: "API usage limit for this key has been reached. Please wait until the next month."
+            message: "API usage limit for this key has been reached"
         });
     }
 
@@ -77,6 +76,7 @@ app.use((req, res) => {
     res.sendStatus(404);
 });
 
+// Start server @ 5001
 const PORT = 5001;
 app.listen(PORT, () => {
     console.log(`Starting at port: ${PORT}`);

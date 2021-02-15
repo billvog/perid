@@ -1,4 +1,1 @@
 - Add user authentication with JWT through API
-
-- Add API keys to user and developer dashboard (remaining requests, etc.)
-  All users have dev dashboard or only those who ask for? 

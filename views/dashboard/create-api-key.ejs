@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Create an API key - Perid</title>
+        <meta name="description" content="Monitor API usage and manage your API keys">
+        <link rel="shortcut icon" href="/assets/PeridIcon.svg" type="image/x-icon">
+        <!-- Bootstrap -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+        <!-- Fontawesome -->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
+        <!-- Custom -->
+        <link rel="stylesheet" href="/css/main.css">
+        <link rel="stylesheet" href="/css/dashboard.css">
+    </head>
+<body>
+    <div class="content-container container">
+        <%- include('../partials/header') %> 
+        <div class="wraper">
+            <h4>Create an API access key</h4>
+            <hr>
+            <div>
+                <form action="/dashboard/create-api-key" method="post">
+                    <%- include('../partials/form-messages') %> 
+                    <div class="mb-3">
+                        <label for="KeyOwnerId" class="form-label">Owner ID</label>
+                        <input type="text" class="form-control" id="KeyOwnerId" name="ownerId" value="<%= user.id %>" disabled>
+                    </div>
+                    <div class="mb-3">
+                        <label for="KeyPlanSelect" class="form-label">Plan</label>
+                        <select class="form-select" id="KeyPlanSelect" name="planSelect" aria-label="Select Plan">
+                            <option <%= typeof planSelect != 'undefined' ? planSelect == 'Basic (1,000 / month)' ? 'selected' : '' : '' %>>
+                                Basic (1,000 / month)
+                            </option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-key"></i> Create</button>
+                    <span class="form-text" style="margin-left: 5px;">
+                        Go to <a href="/dashboard">Dashboard</a>
+                    </span>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+<!-- Bootstrap -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
+</html>

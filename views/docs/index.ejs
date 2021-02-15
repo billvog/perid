@@ -35,16 +35,29 @@
                 <legend>API Documention</legend>
                 <p>
                     Perid also provides an API that you can use in your app to find a user registered is our databases. <br>
-                    The base url of the API is <code>https://api.perid.tk/[api-access-key]/</code> where [api-access-key] is your API access key. <br>
-                    To quickly check if the API is wokring make a request to <code>https://api.perid.tk/[api-access-key]/test</code> using your API key.
+                    <p>
+                        The base url of the API is <code>https://api.perid.tk/[api-access-key]/</code> where [api-access-key] is your API access key. <br>
+                        To quickly check if the API is working make a request to <code>https://api.perid.tk/[api-access-key]/test</code> using your API key.
+                    </p>
+                    If the API is working the output will look like:
+                    <div class="code-container" style="margin-top: 10px;">
+                        <code>
+                            {<br>
+                                &emsp;"error": false,<br>
+                                &emsp;"message": "The API is up!"<br>
+                            }
+                        </code>
+                    </div>
+                    <br>
                     <h5>→ Limits</h5>
                     <p>
-                        Every IP is limited to make 15 requests per minute. This happens to prevent spamming requests. <br>
+                        Every IP is limited to make 30 requests per minute. This happens to prevent spamming requests. <br>
                         Additionaly, a basic API access key can make up to 1,000 requests per month. You can view how many requests you have left in your <a href="/dashboard">dashboard</a>.
                     </p>
+                    <h5>→ API access key</h5>
                     <p>
                         To get yourself an API access key you need to <a href="/account/register">create an account at Perid</a>. That requires not payment. <br>
-                        In case you have already an account, but you don't have an access key please contact us at <a href="mailto:support@perid.tk">support@perid.tk</a>.
+                        Then, go to <a href="/dashboard/create-api-key">Create an API key</a> page to get one right away. Currenlty, each account can only have one API key.
                     </p>
                     <h5>→ Get user by ID</h5>
                     <p>

@@ -18,50 +18,53 @@
     <div class="content-container container">
         <%- include('../partials/header') %> 
         <div class="wraper">
-            <div class="mb-1">
-                <h3>Dashboard</h3>
-                <p>
-                    Here you can monitor your API usage and manage your API keys. <br>
-                    Learn how to use the API <a href="/docs/">here</a>.
-                </p>
-                <hr>
-                <% if (typeof ApiKey == 'undefined') { %> 
-                    <div>
-                        No API key found registered on your account. Please contact support@perid.tk.
+            <h3>Dashboard</h3>
+            <p>
+                Here you can monitor your API usage and manage your API keys. <br>
+                Learn how to use the API <a href="/docs/">here</a>.
+            </p>
+            <hr>
+            <% if (typeof ApiKey == 'undefined') { %> 
+                <div>
+                    No API keys found registered on your account.
+                    <div class="mt-2">
+                        <button class="btn btn-sm btn-primary" onclick="window.location='/dashboard/create-api-key'">
+                            <i class="fas fa-key"></i> Create your first API access key
+                        </button>
                     </div>
-                <% } else { %>
-                    <%- include('../partials/form-messages') %> 
-                    <fieldset class="mb-3">
-                        <legend>Information</legend>
-                        <div class="mb-3">
-                            <label class="form-label"><i class="fas fa-user"></i> Owner ID</label>
-                            <input class="form-control" type="text" value="<%= ApiKey.ownerId %>" disabled='true'>
-                        </div>
-                        <div class="mb-1">
-                            <label class="form-label"><i class="fas fa-key"></i> Your API Access Key</label>
-                            <form action="/dashboard/reset-api-key" method="POST">
-                                <div class="input-group">
-                                    <input class="form-control" type="text" value="<%= ApiKey.key %>" disabled='true'>
-                                    <button type="submit" class="btn btn-sm btn-primary" title="Reset your API key" aria-describedby="resetHelpBlock">Reset</button>
-                                </div>
-                            </form>
-                            <div id="resetHelpBlock" class="form-text">
-                                Reset your API access key in case of it being exposed to 3rd parties
+                </div>
+            <% } else { %>
+                <%- include('../partials/form-messages') %> 
+                <fieldset class="mb-3">
+                    <legend>Information</legend>
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-user"></i> Owner ID</label>
+                        <input class="form-control" type="text" value="<%= ApiKey.ownerId %>" disabled='true'>
+                    </div>
+                    <div class="mb-1">
+                        <label class="form-label"><i class="fas fa-key"></i> Your API Access Key</label>
+                        <form action="/dashboard/reset-api-key" method="POST">
+                            <div class="input-group">
+                                <input class="form-control" type="text" value="<%= ApiKey.key %>" disabled='true'>
+                                <button type="submit" class="btn btn-sm btn-primary" title="Reset your API key" aria-describedby="resetHelpBlock">Reset</button>
                             </div>
+                        </form>
+                        <div id="resetHelpBlock" class="form-text">
+                            Reset your API access key in case of it being exposed to 3rd parties
                         </div>
-                    </fieldset>
-                    <fieldset>
-                        <legend>Monitor</legend>
-                        <!-- API Usage -->
-                        <div class="input-group mb-1">
-                            <span class="badge bg-secondary">API Usage (monthly)</span>
-                            <span class="badge bg-primary">
-                                <span id="req_percent"><%= ((ApiKey.doneRequests / ApiKey.totalRequests) * 100).toFixed(0) %></span>% (<span id="req_done"><%= ApiKey.doneRequests.toLocaleString() %></span> / <span id="req_total"><%= ApiKey.totalRequests.toLocaleString() %></span>)
-                            </span>
-                        </div>
-                    </fieldset>
-                <% } %>
-            </div>
+                    </div>
+                </fieldset>
+                <fieldset>
+                    <legend>Monitor</legend>
+                    <!-- API Usage -->
+                    <div class="input-group mb-1">
+                        <span class="badge bg-secondary">API Usage (monthly)</span>
+                        <span class="badge bg-primary">
+                            <span id="req_percent"><%= ((ApiKey.doneRequests / ApiKey.totalRequests) * 100).toFixed(1) %></span>% (<span id="req_done"><%= ApiKey.doneRequests.toLocaleString() %></span> / <span id="req_total"><%= ApiKey.totalRequests.toLocaleString() %></span>)
+                        </span>
+                    </div>
+                </fieldset>
+            <% } %>
         </div>
     </div>
 </body>

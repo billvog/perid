@@ -1,3 +1,6 @@
+// Models
+const ApiKey = require('../models/ApiKey');
+
 module.exports = {
     ensureAuthenticated: function(req, res, next) {
         if (req.isAuthenticated()) {
@@ -28,6 +31,23 @@ module.exports = {
     ensureNotVerified: function(req, res, next) {
         if (req.user && req.user.verified) {
             res.redirect('/account/my-account');
+        }
+        else {
+            return next();
+        }
+    },
+    ensureApiKeyRegisted: async function(req, res, next) {
+        if (await ApiKey.findOne({ ownerId: req.user.id }) == null) {
+            res.redirect('/dashboard');
+        }
+        else {
+            return next();
+        }
+    },
+    ensureNoApiKeyRegisted: async function(req, res, next) {
+        if (await ApiKey.findOne({ ownerId: req.user.id }) != null) {
+            req.flash('error_msg', "An API key is already registered on your account");
+            res.redirect('/dashboard');
         }
         else {
             return next();
