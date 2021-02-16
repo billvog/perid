@@ -612,9 +612,8 @@ router.get('/my-account', auth.ensureAuthenticated, async (req, res) => {
 
 // Edit my account page
 router.get('/my-account/edit', auth.ensureAuthenticated, (req, res) => {
-    res.render('account/my-account', {
-        user: req.user,
-        edit: true
+    res.render('account/edit-my-account', {
+        user: req.user
     });
 });
 
@@ -754,7 +753,7 @@ router.post('/my-account/edit', auth.ensureAuthenticated, multer.single('avatar'
         await req.user.save();
 
         req.flash('success_msg', 'Your account has been modified');
-        res.redirect('/account/my-account');
+        return res.redirect('/account/my-account');
     }
     catch (error) {
         if (error) throw error;

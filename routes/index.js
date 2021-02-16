@@ -18,7 +18,7 @@ router.get('/pid/:id', async (req, res) => {
     if (user == null || !user.verified) {
         return res.render('index', {
             user: req.user || undefined,
-            error: "User with that ID doesn't exist",
+            error_msg: "User with that ID doesn't exist",
             query
         });
     }

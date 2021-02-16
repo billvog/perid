@@ -4,12 +4,6 @@ const allowedImageFormats = [
 ];
 
 $(document).ready(() => {
-    $('input#ClearAvatarInput').on('click', () => {
-        if (confirm('You sure you want to reset avatar image file?')) {
-            $('input#InputAvatar').val('');
-        }
-    });
-
     const formElement = $('form.validate-u-form');
     formElement.on('submit', (e) => {
         // Remove all alerts
@@ -21,10 +15,12 @@ $(document).ready(() => {
         const passwordConfirm = $('input#InputPasswordConfirm').val();
 
         // Validate avatar size
-        if (avatar!= undefined && avatar.size > maxAvatarSize) {
-            formElement.prepend(`<div class="alert alert-warning alert-dismissible fade show" role="alert">
+        if (avatar != undefined && avatar.size > maxAvatarSize) {
+            formElement.prepend(`<div class="alert alert-warning">
+                <div class="alert-content">
                 Avatar is too big, 5MB is the maximum size
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <button type="button" class="btn-close"><i class="fas fa-times"></i>
             </div>`);
 
             return false;
@@ -32,9 +28,11 @@ $(document).ready(() => {
 
         // Validate avatar image type
         if (avatar!= undefined && !allowedImageFormats.includes(avatar.type)) {
-            formElement.prepend(`<div class="alert alert-warning alert-dismissible fade show" role="alert">
+            formElement.prepend(`<div class="alert alert-warning">
+                <div class="alert-content">
                 Disallowed avatar image format
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <button type="button" class="btn-close"><i class="fas fa-times"></i>
             </div>`);
 
             return false;
@@ -42,9 +40,11 @@ $(document).ready(() => {
 
         // Validate phones
         if (phone.length > 0 && !phone.match('^[+]?[0-9]+$')) {
-            formElement.prepend(`<div class="alert alert-warning alert-dismissible fade show" role="alert">
-                    Phone number is invalid
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            formElement.prepend(`<div class="alert alert-warning">
+                <div class="alert-content">
+                Phone number is invalid
+                </div>
+                <button type="button" class="btn-close"><i class="fas fa-times"></i>
             </div>`);
 
             return false;
@@ -52,18 +52,22 @@ $(document).ready(() => {
 
         // Validate password
         if (password && password.length < 6) {
-            formElement.prepend(`<div class="alert alert-warning alert-dismissible fade show" role="alert">
-                    Password must be at least 6 characters
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            formElement.prepend(`<div class="alert alert-warning">
+                <div class="alert-content">
+                Password must be at least 6 characters
+                </div>
+                <button type="button" class="btn-close"><i class="fas fa-times"></i>
             </div>`);
 
             return false;
         }
 
         if (passwordConfirm.length <= 0) {
-            formElement.prepend(`<div class="alert alert-warning alert-dismissible fade show" role="alert">
-                    Please confirm your password 
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            formElement.prepend(`<div class="alert alert-warning">
+                <div class="alert-content">
+                Please confirm your password
+                </div>
+                <button type="button" class="btn-close"><i class="fas fa-times"></i>
             </div>`);
 
             return false;
@@ -71,9 +75,11 @@ $(document).ready(() => {
 
         // Check if passwords match
         if (password && passwordConfirm  && password.length >= 6 && passwordConfirm.length > 0 && password !== passwordConfirm) {
-            formElement.prepend(`<div class="alert alert-warning alert-dismissible fade show" role="alert">
-                    Passwords do not match
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            formElement.prepend(`<div class="alert alert-warning">
+                <div class="alert-content">
+                Passwords do not match
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"><i class="fas fa-times"></i>
             </div>`);
 
             return false;

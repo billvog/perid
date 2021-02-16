@@ -11,22 +11,22 @@
         <meta name="description" content="Inspect Virtual Personal ID">
     <% } %> 
     <link rel="shortcut icon" href="/assets/PeridIcon.svg" type="image/x-icon">
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
     <!-- Fontawesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
     <!-- Custom -->
     <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/header.css">
+    <link rel="stylesheet" href="/css/form.css">
     <link rel="stylesheet" href="/css/user-preview.css">
 </head>
-<body>
+<body class="preload">
     <div class="content-container container">
         <%- include('./partials/header') %> 
 
         <div class="wraper">
             <%- include('./partials/form-messages') %> 
             <% if (typeof foundUser != 'undefined') { %>
-                <div class="alert alert-success">
+                <div class="mb-3">
                     <fieldset>
                         <legend><%= foundUser.firstName %> <%= foundUser.middleName %> <%= foundUser.lastName %></legend>
                         <div class="avatar-wraper">
@@ -41,18 +41,25 @@
                             <% } %> 
                         </div>
                         <div class="user-info-wraper">
-                            <b>ID</b> <%= foundUser.id %><br>
-                            <b>Full Name</b> <%= foundUser.firstName %> <%= foundUser.middleName %> <%= foundUser.lastName %><br>
-                            <b>Birthdate</b> <%= new Date(foundUser.birthdate).toLocaleString().split(',')[0] %><br>
-                            <div class="phone-numbers-group">
+                            <div class="mb-1">
+                                <b>ID</b> <%= foundUser.id %>
+                            </div>
+                            <div class="mb-1">
+                                <b>Full Name</b> <%= foundUser.firstName %> <%= foundUser.middleName %> <%= foundUser.lastName %><br>
+                            </div>
+                            <div class="mb-1">
+                                <b>Birthdate</b> <%= new Date(foundUser.birthdate).toLocaleString().split(',')[0] %><br>
+                            </div>
+                            <div class="mb-1">
                                 <% if (user.phone != null) { %> 
-                                    <!-- Phone -->
                                     <b>Phone</b> <a href="tel:<%= foundUser.phone %>"><%= foundUser.phone %></a><br>
-                                <% } else { %> 
-                                    <i>No phone provided</i>
+                                    <% } else { %> 
+                                    <b>Phone</b> <i>No phone provided</i>
                                 <% } %> 
                             </div>
-                            <b>Email</b> <a href="mailto:<%= foundUser.email %>"><%= foundUser.email %></a>
+                            <div class="mb-0">
+                                <b>Email</b> <a href="mailto:<%= foundUser.email %>"><%= foundUser.email %></a>
+                            </div>
                         </div>
                     </fieldset>
                 </div>
@@ -63,7 +70,7 @@
 </body>
 <!-- Bootstrap -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
+<script src="/js/main.js"></script>
 <script>
     if (window.history.length <= 1) {
         $('button#go-back-btn').hide();

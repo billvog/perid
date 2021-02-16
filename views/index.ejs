@@ -6,43 +6,41 @@
     <title>User Lookup - Perid</title>
     <meta name="description" content="A Virtual Personal ID for everyone.">
     <link rel="shortcut icon" href="/assets/PeridIcon.svg" type="image/x-icon">
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
     <!-- Fontawesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
     <!-- Custom -->
     <link rel="stylesheet" href="/css/main.css">
-    <link rel="stylesheet" href="/css/user-preview.css">
+    <link rel="stylesheet" href="/css/header.css">
+    <link rel="stylesheet" href="/css/form.css">
 </head>
-<body>
+<body class="preload">
     <div class="content-container container">
         <%- include('./partials/header') %> 
 
         <div class="wraper">
-            <form id="lookup-pid-form" method="POST">
+            <form id="lookup-pid-form" class="d-block" method="POST">
                 <div class="mb-3">
-                    <h4>Search Engine – Perid</h4>
-                    <p>Use this search engine to find a user by his unique id. Learn more about Perid <a href="/docs#about">here</a>.</p>
+                    <h2>Perid Search Engine</h2>
+                    <p>Use this search engine to find users registered in Perid. <br>
+                    Learn more about Perid <a href="/docs#about">here</a>.</p>
                 </div>
                 <hr>
-                <div class="mb-3">
+                <div class="mb-3 msg-wraper">
                     <%- include('./partials/form-messages') %> 
                 </div>
-                <div class="mb-2">
-                    <label for="InputId" class="form-label">User ID</label>
-                    <input type="text" class="form-control" id="InputId" placeholder="Enter user's ID" required
+                <div class="mb-1 form-wraper">
+                    <label for="InputId">User ID</label>
+                    <input type="text" id="InputId" placeholder="Enter user's ID" required
                     value="<%= typeof query != 'undefined' ? query : '' %>">
                 </div>
                 <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Find User</button>
             </form>
-            <div class="message-container"></div>
         </div>
     </div>
 </body>
-<!-- Bootstrap -->
+<!-- jQuery -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
 <!-- Custom -->
-<script src="/js/message.js"></script>
+<script src="/js/main.js"></script>
 <script src="/js/index.js"></script>
 </html>

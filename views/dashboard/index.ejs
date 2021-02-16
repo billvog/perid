@@ -6,19 +6,20 @@
     <title>API Dashboard - Perid</title>
     <meta name="description" content="Monitor API usage and manage your API keys">
     <link rel="shortcut icon" href="/assets/PeridIcon.svg" type="image/x-icon">
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
     <!-- Fontawesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
     <!-- Custom -->
     <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/header.css">
+    <link rel="stylesheet" href="/css/form.css">
+    <link rel="stylesheet" href="/css/modal.css">
     <link rel="stylesheet" href="/css/dashboard.css">
 </head>
-<body>
+<body class="preload">
     <div class="content-container container">
         <%- include('../partials/header') %> 
         <div class="wraper">
-            <h3><%= user.firstName %>'s Dashboard</h3>
+            <h2><%= user.firstName %>'s Dashboard</h2>
             <p>
                 Here you can monitor your API usage and manage your API keys. <br>
                 Learn how to use the API <a href="/docs/">here</a>.
@@ -29,7 +30,7 @@
                     No API keys found registered on your account.
                     <div class="mt-2">
                         <button class="btn btn-sm btn-primary mono-font" onclick="window.location='/dashboard/create-api-key'">
-                            <i class="fas fa-key"></i> Create your first API access key
+                            <i class="fas fa-key"></i> Create API Access Key
                         </button>
                     </div>
                 </div>
@@ -37,16 +38,19 @@
                 <%- include('../partials/form-messages') %> 
                 <fieldset class="mb-3">
                     <legend>Information</legend>
-                    <div class="mb-3">
-                        <label class="form-label"><i class="fas fa-user"></i> Owner ID</label>
-                        <input class="form-control  " type="text" value="<%= ApiKey.ownerId %>" disabled='true'>
+                    <div class="mb-2">
+                        <label><i class="fas fa-user"></i> Owner ID</label>
+                        <input type="text" value="<%= ApiKey.ownerId %>" disabled='true'>
                     </div>
+                    <civ class="mb-2">
+                        <label><i class="fas fa-scroll"></i> Plan</label>
+                        <input type="text" value="<%= ApiKeyPlan %>" disabled='true'>
+                    </civ>
                     <div class="mb-1">
-                        <label class="form-label"><i class="fas fa-key"></i> Your API Access Key</label>
-                        <div class="input-group api-info-group">
-                            <input class="form-control mono-font" type="text" value="<%= ApiKey.key %>" disabled='true'>
-                            <button type="submit" class="btn btn-sm btn-primary" title="Reset your API key" aria-describedby="resetHelpBlock"
-                            data-bs-toggle="modal" data-bs-target="#resetApiKeyModal">Reset</button>
+                        <label><i class="fas fa-key"></i> Your API Access Key</label>
+                        <div class="api-key-info-group">
+                            <input class="mono-font" type="text" value="<%= ApiKey.key %>" disabled='true'>
+                            <button type="submit" class="btn resetApiKeyOpenModalBtn" title="Reset your API key" aria-describedby="resetHelpBlock">Reset</button>
                         </div>
                         <div id="resetHelpBlock" class="form-text">
                             This key is secret, do not share it with 3rd parties. In case of it being exposed you can reset it.
@@ -58,7 +62,7 @@
                     <!-- API Usage -->
                     <div class="mb-1 api-mon-usage-group">
                         <div class="mb-2 group-title">
-                            <i class="fas fa-chart-area"></i> API Usage <span class="light-text">(monthly)</span>
+                            <i class="fas fa-chart-area"></i> API Usage
                         </div>
                         <div class="mb-0 group-content">
                             <span id="req_percent"><%= ((ApiKey.doneRequests / ApiKey.totalRequests) * 100).toFixed(1) %></span>% 
@@ -71,28 +75,35 @@
     </div>
     <% if (typeof ApiKey != 'undefined') { %> 
     <!-- Reset API key Confirm -->
-    <div class="modal fade" id="resetApiKeyModal" tabindex="-1" aria-labelledby="resetApiKeyModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-            <h5 class="modal-title" id="resetApiKeyModalLabel">Confirm</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
+    <div id="resetApiKeyModal" class="modal">
+        <div class="modal-wraper">
+            <div class="modal-title">Confirm</div>
+            <div class="modal-content">
                 Are you sure you want to reset your API access key?
             </div>
             <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <form action="/dashboard/reset-api-key" id="reset-api-key-form" method="POST">
-                <button type="submit" class="btn btn-primary">Reset</button>
-            </form>
+                <form action="/dashboard/reset-api-key" id="reset-api-key-form" method="POST">
+                    <button type="submit" class="btn btn-primary">Reset</button>
+                </form>
+                <button type="button" class="btn btn-secondary dismiss-modal">Cancel</button>
             </div>
         </div>
-        </div>
     </div>
+
     <% } %> 
 </body>
 <!-- Bootstrap -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
+<script src="/js/main.js"></script>
+<script>
+    $(document).ready(() => {
+        $('.resetApiKeyOpenModalBtn').on('click', () => {
+            $('#resetApiKeyModal').css('display', 'block');
+        });
+
+        $('#resetApiKeyModal .dismiss-modal').on('click', () => {
+            $('#resetApiKeyModal').css('display', 'none');
+        });
+    });
+</script>
 </html>

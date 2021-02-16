@@ -4,6 +4,23 @@
     font-family: 'Roboto Mono', monospace;
 }
 
+.api-key-info-group {
+    display: flex;
+    flex-direction: row;
+}
+
+.api-key-info-group input {
+    flex-grow: 2;
+    border: none;
+    border-radius: 3px 0 0 3px;
+}
+
+.api-key-info-group button {
+    height: 36px;
+    transform: translateY(5px);
+    border-radius: 0 3px 3px 0;
+}
+
 .api-mon-usage-group {
     background-color: #E8ECEF;
     border: 2px solid hsl(206, 18%, 82%);
@@ -12,8 +29,12 @@
 }
 
 .api-mon-usage-group .group-title {
-    font-weight: bold;
+    font-weight: 600;
     font-size: 12pt;
+}
+
+.api-mon-usage-group .group-title .fas {
+    margin-right: 5px;
 }
 
 .api-mon-usage-group .group-content {

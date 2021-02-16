@@ -6,15 +6,34 @@ const auth = require('../config/auth');
 const User = require('../models/User');
 const ApiKey = require('../models/ApiKey');
 
+// API Access Key Plans
+const plans = [
+    {
+        title: 'Basic',
+        limit: 1000
+    }
+]
+
 router.get('/', async (req, res) => {
     // Find user's api key
     const key = await ApiKey.findOne({
         ownerId: req.user.id
     });
+
+    let PlanFullTitle;
+    if (key !== null) {
+        for (const plan of plans) {
+            if (key.totalRequests == plan.limit) {
+                PlanFullTitle = `${plan.title} (${plan.limit} / month)`;
+                break;
+            }
+        }
+    }
     
     res.render('dashboard/index', {
         user: req.user,
-        ApiKey: key || undefined
+        ApiKey: key || undefined,
+        ApiKeyPlan: PlanFullTitle
     });
 });
 

@@ -6,212 +6,90 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Account - Perid</title>
-    <meta name="description" content="View & Edit your Virtual Personal ID">
+    <meta name="description" content="View your Virtual Personal ID">
     <link rel="shortcut icon" href="/assets/PeridIcon.svg" type="image/x-icon">
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
     <!-- Fontawesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
     <!-- Custom -->
     <link rel="stylesheet" href="/css/main.css">
-    <link rel="stylesheet" href="/css/user-form.css">
-    <link rel="stylesheet" href="/css/user-preview.css">
+    <link rel="stylesheet" href="/css/header.css">
+    <link rel="stylesheet" href="/css/form.css">
+    <link rel="stylesheet" href="/css/modal.css">
 </head>
-<body>
+<body class="preload">
     <div class="content-container container">
         <%- include('../partials/header') %> 
         <div class="wraper">
-            <% if (EditAccount) { %>
-                <form id="edit-account-form" class="validate-u-form" action="/account/my-account/edit" method="POST" enctype="multipart/form-data">
-                    <%- include('../partials/form-messages') %> 
-                    <!-- Avatar -->
-                    <div class="mb-3">
-                        <label for="InputAvatar" class="form-label">User Avatar</label>
-                        <% if (user.avatarUrl != null) { %> 
-                            <div class="mb-2 remove-avatar-btn">
-                                <button class="btn btn-danger" type="button"
-                                title="Remove user avatar..."
-                                data-bs-toggle="modal" data-bs-target="#removeAvatarModal">
-                                    Remove Avatar...
-                                </button>
-                                <input type="hidden" name="remove_avatar" id="hInputRemoveAvatar" value="false">
-                            </div>
+            <%- include('../partials/form-messages') %> 
+            <fieldset>
+                <legend>
+                    <a href="/account/my-account/edit" title='Edit My Account'><i class="fas fa-user-edit"></i></a> 
+                    Account Information
+                </legend>
+                <span>
+                    <% if (!user.verified) { %> 
+                        <div class="mb-3">
+                            <a href="/account/verify-email" class="btn btn-dark" title="Account verification is required">
+                                Verify your account
+                            </a>
+                        </div>
+                    <% } %> 
+                    <div class="avatar-wraper">
+                        <% if (typeof user.avatarUrl != 'undefined' && user.avatarUrl !== null) { %>
+                            <img class="user-avatar" src="<%= user.avatarUrl %>">
                         <% } %> 
-                        <div class="choose-avatar"
-                        <% if (user.avatarUrl != null) { %> style='display:none' <% } %>>
-                            <div class="input-group mb-2">
-                                <input type="file" name="avatar" id="InputAvatar" class="form-control" aria-describedby="mAvatarHelp">
-                                <input type="button" value="Clear" id="ClearAvatarInput" class="btn btn-danger">
-                            </div>
-                            <div id="mAvatarHelp" class="form-text">Only JPG, JPEG, PNG formats allowed. Maximum size: 5MB</div>
-                        </div>
-                    </div>
-                    <!-- First Name -->
-                    <div class="mb-2">
-                        <label for="InputFName" class="form-label">First Name (*)</label>
-                        <input type="text" class="form-control" id="InputFName" name="firstName" placeholder="Enter First Name"
-                        value="<%= typeof firstName != 'undefined' ? firstName : user.firstName %>">
-                    </div>
-                    <!-- Middle Name -->
-                    <div class="mb-2">
-                        <label for="InputMName" class="form-label">Middle Name</label>
-                        <input type="text" class="form-control" id="InputMName" name="middleName" placeholder="Enter Middle Name"
-                        value="<%= typeof middleName != 'undefined' ? middleName : user.middleName %>" aria-describedby="mNameHelp">
-                        <div id="mNameHelp" class="form-text">Leave blank if you don't have one</div>
-                    </div>
-                    <!-- Last Name -->
-                    <div class="mb-2">
-                        <label for="InputLName" class="form-label">Last Name (*)</label>
-                        <input type="text" class="form-control" id="InputLName" name="lastName" placeholder="Enter Last Name"
-                        value="<%= typeof lastName != 'undefined' ? lastName : user.lastName %>">
-                    </div>
-                    <!-- Birthdate -->
-                    <div class="mb-2">
-                        <label for="InputBDate" class="form-label">Birthdate (*)</label>
-                        <input type="date" class="form-control" id="InputBDate" name="birthdate"
-                        value="<%= typeof birthdate != 'undefined' ? new Date(birthdate).toISOString().split('T')[0] : new Date(user.birthdate).toISOString().split('T')[0] %>">
-                    </div>
-                    <!-- Phone -->
-                    <div class="mb-2">
-                        <label for="InputPhone" class="form-label">Phone</label>
-                        <input type="tel" class="form-control" id="InputPhone" name="phone" placeholder="Enter Phone"
-                        value="<%= typeof phone != 'undefined' ? phone : user.phone != null ? user.phone : '' %>">
-                    </div>
-                    <!-- Email -->
-                    <div class="mb-2">
-                        <label for="InputEMail" class="form-label">Email (*)</label>
-                        <input type="email" class="form-control" id="InputEMail" name="email" placeholder="Enter Email"
-                        value="<%= typeof email != 'undefined' ? email : user.email %>" required>
-                    </div>
-                    <!-- Confirm Password -->
-                    <div class="mb-3">
-                        <label for="InputPasswordConfirm" class="form-label">Confirm Password (*)</label>
-                        <input type="password" class="form-control" id="InputPasswordConfirm" name="passwordConfirm" placeholder="Confirm Password" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary"><i class="fas fa-check"></i> Save</button>
-                    <a class="btn btn-secondary" href="/account/my-account"><i class="fas fa-times"></i> Cancel</a>
-                    <div class="form-bottom-text f-right">
-                        (*) are required fields
-                    </div>
-                </form>
-
-                <% if (user.avatarUrl !== null) { %> 
-                <!-- Remove Avatar Confirm Modal -->
-                <div class="modal fade" id="removeAvatarModal" tabindex="-1" aria-labelledby="removeAvatarModalLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="removeAvatarModalLabel">Confirm</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            Are you sure you want to remove avatar from user?
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
-                            <button type="button" class="btn btn-primary" onclick="RemoveAvatar()">Yes</button>
-                        </div>
-                        </div>
-                    </div>
-                </div>
-                <% } %> 
-            <% } else { %>
-                <%- include('../partials/form-messages') %> 
-                <fieldset>
-                    <legend>
-                        <a href="/account/my-account/edit" title='Edit My Account'><i class="fas fa-user-edit"></i></a> 
-                        Account Information
-                    </legend>
-                    <span>
-                        <% if (!user.verified) { %> 
-                            <div class="mb-3">
-                                <a href="/account/verify-email" class="btn btn-dark" title="Account verification is required">
-                                    Verify your account
-                                </a>
-                            </div>
+                        <% if (typeof userQrImage != 'undefined' && userQrImage !== null) { %>
+                            <img class="user-qr" src="<%= userQrImage %>">
+                        <% } else { %> 
+                            <img class="user-qr" src="/assets/NoQrAvailable.png"
+                            title="The was a problem generating the Qr Code" alt="No Qr Code Available">
                         <% } %> 
-                        <div class="avatar-wraper">
-                            <% if (typeof user.avatarUrl != 'undefined' && user.avatarUrl !== null) { %>
-                                <img class="user-avatar" src="<%= user.avatarUrl %>">
-                            <% } %> 
-                            <% if (typeof userQrImage != 'undefined' && userQrImage !== null) { %>
-                                <img class="user-qr" src="<%= userQrImage %>">
+                    </div>
+                    <div class="user-info-wraper">
+                        <div class="mb-1">
+                            <b>ID</b> <%= user.id %>
+                        </div>
+                        <div class="mb-1">
+                            <b>Full Name</b> <%= user.firstName %> <%= user.middleName %> <%= user.lastName %>
+                        </div>
+                        <div class="mb-1">
+                            <b>Birthdate</b> <%= new Date(user.birthdate).toLocaleString().split(',')[0] %>
+                        </div>
+                        <div class="mb-1">
+                            <% if (user.phone != null) { %> 
+                                <!-- Phone -->
+                                <b>Phone</b> <a href="tel:<%= user.phone %>"><%= user.phone %></a>
                             <% } else { %> 
-                                <img class="user-qr" src="/assets/NoQrAvailable.png"
-                                title="The was a problem generating the Qr Code" alt="No Qr Code Available">
+                                <b>Phone</b> <i>No phone provided</i>
                             <% } %> 
                         </div>
-                        <div class="user-info-wraper">
-                            <div class="mb-1">
-                                <b>ID</b> <%= user.id %>
-                            </div>
-                            <div class="mb-1">
-                                <b>Full Name</b> <%= user.firstName %> <%= user.middleName %> <%= user.lastName %>
-                            </div>
-                            <div class="mb-1">
-                                <b>Birthdate</b> <%= new Date(user.birthdate).toLocaleString().split(',')[0] %>
-                            </div>
-                            <div class="mb-1">
-                                <% if (user.phone != null) { %> 
-                                    <!-- Phone -->
-                                    <b>Phone</b> <a href="tel:<%= user.phone %>"><%= user.phone %></a>
-                                <% } else { %> 
-                                    <b>Phone</b> <span class="badge bg-primary">No phone provided</span>
-                                <% } %> 
-                            </div>
-                            <div class="mb-1">
-                                <b>Email</b> <a href="mailto:<%= user.email %>"><%= user.email %></a>
-                            </div>
+                        <div class="mb-1">
+                            <b>Email</b> <a href="mailto:<%= user.email %>"><%= user.email %></a>
                         </div>
-                        <hr>
-                        <div class="row mb-2">
-                            <div class="col-sm-auto">
-                                <a class="btn btn-success btn-sm" title="Visit My Dashboard" href="/dashboard">My Dashboard</a>
-                            </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col">
+                            <a class="btn btn-success" title="Visit My Dashboard" href="/dashboard">My Dashboard</a>
                         </div>
-                        <hr>
-                        <div class="row g-2">
-                            <div class="col-sm-auto">
-                                <a class="btn btn-primary btn-sm" title="Change Account's Password" href="/account/my-account/change-password">Change Password</a>
-                            </div>
-                            <div class="col-sm-auto">
-                                <form action="/account/logout?_m=DELETE" method="post">
-                                    <button type="submit" class="btn btn-danger btn-sm" title='Logout'>Logout</button>
-                                </form>
-                            </div>
+                    </div>
+                    <hr>
+                    <div class="row mb-1">
+                        <div class="col">
+                            <a class="btn btn-primary" title="Change Account's Password" href="/account/my-account/change-password">Change Password</a>
                         </div>
-                    </span>
-                </fieldset>
-            <% } %>
+                        <div class="col">
+                            <form action="/account/logout?_m=DELETE" method="post">
+                                <button type="submit" class="btn btn-danger" title='Logout'>Logout</button>
+                            </form>
+                        </div>
+                    </div>
+                </span>
+            </fieldset>
         </div>
     </div>
 </body>
 <!-- Bootstrap -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
-<!-- Custom -->
-<script src="/js/user-form-validation.js"></script>
-<% if (EditAccount && user.avatarUrl != null) { %> 
-<script>
-    // Modal
-    var removeAvatarModal;
-
-    $(document).ready(() => {
-        $('#InputAvatar').show();
-
-        // Initialize remove avatar confirm modal
-        removeAvatarModal = new bootstrap.Modal(document.getElementById('removeAvatarModal'));
-    });
-    
-    function RemoveAvatar() {
-        $('#hInputRemoveAvatar').val('true');
-
-        // Hide confirm modal
-        removeAvatarModal.hide();
-
-        $('.choose-avatar').show();
-        $('.remove-avatar-btn').hide();
-    }
-</script>
-<% } %> 
+<script src="/js/main.js"></script>
 </html>

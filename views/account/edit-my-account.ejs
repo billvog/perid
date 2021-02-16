@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit My Account - Perid</title>
+    <meta name="description" content="Edit your Virtual Personal ID information">
+    <link rel="shortcut icon" href="/assets/PeridIcon.svg" type="image/x-icon">
+    <!-- Fontawesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
+    <!-- Custom -->
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/header.css">
+    <link rel="stylesheet" href="/css/form.css">
+    <link rel="stylesheet" href="/css/modal.css">
+    <link rel="stylesheet" href="/css/user-preview.css">
+</head>
+<body class="preload">
+    <div class="content-container container">
+        <%- include('../partials/header') %> 
+        <div class="wraper">
+            <form id="edit-account-form" class="validate-u-form d-block" action="/account/my-account/edit" method="POST" enctype="multipart/form-data">
+                <%- include('../partials/form-messages') %> 
+                <!-- Avatar -->
+                <div class="mb-3">
+                    <label for="InputAvatar">User Avatar</label>
+                    <% if (user.avatarUrl != null) { %> 
+                        <div class="mb-3 mt-1 remove-avatar-btn">
+                            <button class="btn btn-danger removeAvatarModalOpenBtn" type="button" title="Remove user avatar...">
+                                Remove Avatar...
+                            </button>
+                            <input type="hidden" name="remove_avatar" id="hInputRemoveAvatar" value="false">
+                        </div>
+                    <% } %> 
+                    <div class="choose-avatar"
+                    <% if (user.avatarUrl != null) { %> style='display:none' <% } %>>
+                        <div class="mt-2 mb-2 file-select-group">
+                            <button id="SelectFileBtn" type="button" class="btn">Choose file</button>
+                            <label for="SelectFileBtn">no file selected</label>
+                        </div>
+                        <div class="mb-2">
+                            <button id="ClearFileBtn" type="button" class="btn btn-danger">Clear</button>
+                        </div>
+                        <input type="file" name="avatar" id="InputAvatar" style="display: none;">
+                        <div id="mAvatarHelp" class="form-text">Only JPG, JPEG, PNG formats allowed. Maximum size: 5MB</div>
+                    </div>
+                </div>
+                <!-- First Name -->
+                <div class="mb-3">
+                    <label for="InputFName" class="required">First Name</label>
+                    <input type="text" id="InputFName" name="firstName" placeholder="Enter First Name"
+                    value="<%= typeof firstName != 'undefined' ? firstName : user.firstName %>">
+                </div>
+                <!-- Middle Name -->
+                <div class="mb-3">
+                    <label for="InputMName">Middle Name</label>
+                    <input type="text" id="InputMName" name="middleName" placeholder="Enter Middle Name"
+                    value="<%= typeof middleName != 'undefined' ? middleName : user.middleName %>" aria-describedby="mNameHelp">
+                    <div id="mNameHelp" class="form-text">Leave blank if you don't have one</div>
+                </div>
+                <!-- Last Name -->
+                <div class="mb-3">
+                    <label for="InputLName" class="required">Last Name</label>
+                    <input type="text" id="InputLName" name="lastName" placeholder="Enter Last Name"
+                    value="<%= typeof lastName != 'undefined' ? lastName : user.lastName %>">
+                </div>
+                <!-- Birthdate -->
+                <div class="mb-3">
+                    <label for="InputBDate" class="required">Birthdate</label>
+                    <input type="date" id="InputBDate" name="birthdate"
+                    value="<%= typeof birthdate != 'undefined' ? new Date(birthdate).toISOString().split('T')[0] : new Date(user.birthdate).toISOString().split('T')[0] %>">
+                </div>
+                <!-- Phone -->
+                <div class="mb-3">
+                    <label for="InputPhone">Phone</label>
+                    <input type="tel" id="InputPhone" name="phone" placeholder="Enter Phone"
+                    value="<%= typeof phone != 'undefined' ? phone : user.phone != null ? user.phone : '' %>">
+                </div>
+                <!-- Email -->
+                <div class="mb-3">
+                    <label for="InputEMail" class="required">Email</label>
+                    <input type="email" id="InputEMail" name="email" placeholder="Enter Email"
+                    value="<%= typeof email != 'undefined' ? email : user.email %>" required>
+                </div>
+                <!-- Confirm Password -->
+                <div class="mb-3">
+                    <label for="InputPasswordConfirm" class="required">Confirm Password</label>
+                    <input type="password" id="InputPasswordConfirm" name="passwordConfirm" placeholder="Confirm Password" required>
+                </div>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-check"></i> Save</button>
+                <a class="btn" href='/account/my-account'><i class="fas fa-times"></i> Cancel</a>
+            </form>
+
+            <% if (user.avatarUrl !== null) { %> 
+            <!-- Remove Avatar Confirm Modal -->
+            <div id="removeAvatarModal" class="modal">
+                <div class="modal-wraper">
+                    <div class="modal-title">Confirm</div>
+                    <div class="modal-content">
+                        Are you sure you want to remove avatar from user?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" onclick="RemoveAvatar()">Remove</button>
+                        <button type="button" class="btn dismiss-modal">Cancel</button>
+                    </div>
+                </div>
+            </div>
+            <% } %>
+
+            <!-- Clear Avatar Confirm Modal -->
+            <div id="clearAvatarModal" class="modal">
+                <div class="modal-wraper">
+                    <div class="modal-title">Confirm</div>
+                    <div class="modal-content">
+                        Are you sure you want to clear avatar image file?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" onclick="ClearAvatar()">Clear</button>
+                        <button type="button" class="btn dismiss-modal">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<!-- Bootstrap -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<!-- Custom -->
+<script src="/js/main.js"></script>
+<script src="/js/user-form-validation.js"></script>
+<script>
+    $(document).ready(() => {
+        // Remove avatar confirm modal
+        $('.removeAvatarModalOpenBtn').on('click', () => {
+            $('#removeAvatarModal').css('display', 'block');
+        });
+
+        $('#removeAvatarModal .dismiss-modal').on('click', () => {
+            $('#removeAvatarModal').css('display', 'none');
+        });
+
+        // Clear avatar confirm modal
+        $('#ClearFileBtn').on('click', () => {
+            if ($('input#InputAvatar').val().length > 0)
+                $('#clearAvatarModal').css('display', 'block');
+        });
+
+        $('#clearAvatarModal .dismiss-modal').on('click', () => {
+            $('#clearAvatarModal').css('display', 'none');
+        });
+    });
+
+    function ClearAvatar() {
+        $('input#InputAvatar').val('');
+        $('.file-select-group label').text('no file selected');
+        $('.file-select-group label').removeClass('wrong');
+
+        // Hide confirm modal
+        $('#clearAvatarModal').css('display', 'none');
+    }
+
+    function RemoveAvatar() {
+        $('#hInputRemoveAvatar').val('true');
+
+        // Hide confirm modal
+        $('#removeAvatarModal').css('display', 'none');
+
+        $('.choose-avatar').show();
+        $('.remove-avatar-btn').hide();
+    }
+</script>
+</html>

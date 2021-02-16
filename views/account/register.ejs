@@ -6,84 +6,84 @@
     <title>Register - Perid</title>
     <meta name="description" content="Create a Virtual Personal ID now for free.">
     <link rel="shortcut icon" href="/assets/PeridIcon.svg" type="image/x-icon">
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
     <!-- Fontawasome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
     <!-- Custom -->
     <link rel="stylesheet" href="/css/main.css">
-    <link rel="stylesheet" href="/css/user-form.css">
+    <link rel="stylesheet" href="/css/header.css">
+    <link rel="stylesheet" href="/css/form.css">
 </head>
-<body>
+<body class="preload">
     <div class="content-container container">
         <%- include('../partials/header') %> 
 
         <div class="wraper">
-            <form id="create-pid-form" class="validate-u-form" action="/account/register" method="POST" enctype="multipart/form-data" autocomplete="off">
+            <form id="create-pid-form" class="validate-u-form d-block" action="/account/register" method="POST" enctype="multipart/form-data" autocomplete="off">
                 <%- include('../partials/form-messages') %>
                 <!-- Avatar -->
                 <div class="mb-3">
-                    <label for="InputAvatar" class="form-label">User Avatar</label>
-                    <input type="file" name="avatar" id="InputAvatar" class="form-control" aria-describedby="mAvatarHelp">
+                    <label for="InputAvatar">User Avatar</label>
+                    <div class="mt-2 mb-2 file-select-group">
+                        <button id="SelectFileBtn" class="btn" type="button">Choose file</button>
+                        <label for="SelectFileBtn">no file selected</label>
+                    </div>
+                    <input type="file" name="avatar" id="InputAvatar" style="display: none;">
                     <div id="mAvatarHelp" class="form-text">Only JPG, JPEG, PNG formats allowed. Maximum size: 5MB</div>
                 </div>
                 <!-- First Name -->
-                <div class="mb-2">
-                    <label for="InputFName" class="form-label">First Name (*)</label>
-                    <input type="text" class="form-control" id="InputFName" name="firstName" placeholder="Enter First Name"
+                <div class="mb-3">
+                    <label for="InputFName" class="required">First Name</label>
+                    <input type="text" id="InputFName" name="firstName" placeholder="Enter First Name"
                     value="<%= typeof firstName != 'undefined' ? firstName : '' %>" required>
                 </div>
                 <!-- Middle Name -->
-                <div class="mb-2">
-                    <label for="InputMName" class="form-label">Middle Name</label>
-                    <input type="text" class="form-control" id="InputMName" name="middleName" placeholder="Enter Middle Name"
+                <div class="mb-3">
+                    <label for="InputMName">Middle Name</label>
+                    <input type="text" id="InputMName" name="middleName" placeholder="Enter Middle Name"
                     value="<%= typeof middleName != 'undefined' ? middleName : '' %>" aria-describedby="mNameHelp">
                     <div id="mNameHelp" class="form-text">Leave blank if you don't have one</div>
                 </div>
                 <!-- Last Name -->
-                <div class="mb-2">
-                    <label for="InputLName" class="form-label">Last Name (*)</label>
-                    <input type="text" class="form-control" id="InputLName" name="lastName" placeholder="Enter Last Name"
+                <div class="mb-3">
+                    <label for="InputLName" class="required">Last Name</label>
+                    <input type="text" id="InputLName" name="lastName" placeholder="Enter Last Name"
                     value="<%= typeof lastName != 'undefined' ? lastName : '' %>" required>
                 </div>
                 <!-- Birthdate -->
-                <div class="mb-2">
-                    <label for="InputBDate" class="form-label">Birthdate (*)</label>
-                    <input type="date" class="form-control" id="InputBDate" name="birthdate"
+                <div class="mb-3">
+                    <label for="InputBDate" class="required">Birthdate</label>
+                    <input type="date" id="InputBDate" name="birthdate"
                     value="<%= typeof birthdate != 'undefined' ? new Date(birthdate).toISOString().split('T')[0] : '' %>" required>
                 </div>
                 <!-- Phone -->
-                <div class="col-sm mb-2">
-                    <label for="InputPhone" class="form-label">Phone</label>
-                    <input type="tel" class="form-control" id="InputPhone" name="phone" placeholder="Enter Phone"
+                <div class="mb-3">
+                    <label for="InputPhone">Phone</label>
+                    <input type="tel" id="InputPhone" name="phone" placeholder="Enter Phone"
                     value="<%= typeof phone != 'undefined' ? phone : '' %>">
                 </div>
                 <!-- Email -->
-                <div class="mb-2">
-                    <label for="InputEMail" class="form-label">Email (*)</label>
-                    <input type="email" class="form-control" id="InputEMail" name="email" placeholder="Enter Email"
+                <div class="mb-3">
+                    <label for="InputEMail" class="required">Email</label>
+                    <input type="email" id="InputEMail" name="email" placeholder="Enter Email"
                     value="<%= typeof email != 'undefined' ? email : '' %>" required>
                 </div>
                 <!-- Password -->
-                <div class="mb-2">
-                    <label for="InputPassword" class="form-label">Password (*)</label>
-                    <input type="password" class="form-control" id="InputPassword" name="password" placeholder="Enter Password" required>
+                <div class="mb-3">
+                    <label for="InputPassword" class="required">Password</label>
+                    <input type="password" id="InputPassword" name="password" placeholder="Enter Password" required>
                 </div>
                 <!-- Confirm Password -->
                 <div class="mb-3">
-                    <label for="InputPasswordConfirm" class="form-label">Confirm Password (*)</label>
-                    <input type="password" class="form-control" id="InputPasswordConfirm" name="passwordConfirm" placeholder="Repeat Password" required>
+                    <label for="InputPasswordConfirm" class="required">Confirm Password</label>
+                    <input type="password" id="InputPasswordConfirm" name="passwordConfirm" placeholder="Repeat Password" required>
                 </div>
-                <button type="submit" class="btn btn-dark"><i class="fas fa-user-plus"></i> Register</button>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-user-plus"></i> Register</button>
                 <span class="form-text" style="margin-left: 5px;">
                     Have an Account? <a href="/account/login">Login</a>
                 </span>
-                <div class="form-bottom-text f-right">
-                    (*) are required fields
-                </div>
                 <div class="form-text" style="margin-top: 15px;">
                     <div>
-                        Clicking the "Register" button requires you to agree the <a href="/docs/tos">Terms of Services (TOS)</a>.
+                        Clicking the "Register" button requires you to agree the <a href="/docs/tos">Terms of Services</a>.
                     </div>
                 </div>
             </form>
@@ -92,7 +92,7 @@
 </body>
 <!-- Bootstrap -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
 <!-- Custom -->
+<script src="/js/main.js"></script>
 <script src="/js/user-form-validation.js"></script>
 </html>
