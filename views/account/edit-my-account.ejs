@@ -27,7 +27,7 @@
                     <% if (user.avatarUrl != null) { %> 
                         <div class="mb-3 mt-1 remove-avatar-btn">
                             <button class="btn btn-danger removeAvatarModalOpenBtn" type="button" title="Remove user avatar...">
-                                Remove Avatar...
+                                Remove Avatar
                             </button>
                             <input type="hidden" name="remove_avatar" id="hInputRemoveAvatar" value="false">
                         </div>
@@ -39,7 +39,7 @@
                             <label for="SelectFileBtn">no file selected</label>
                         </div>
                         <div class="mb-2">
-                            <button id="ClearFileBtn" type="button" class="btn btn-danger">Clear</button>
+                            <button id="ClearFileBtn" type="button" class="btn btn-danger" disabled='true'>Clear</button>
                         </div>
                         <input type="file" name="avatar" id="InputAvatar" style="display: none;">
                         <div id="mAvatarHelp" class="form-text">Only JPG, JPEG, PNG formats allowed. Maximum size: 5MB</div>

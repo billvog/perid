@@ -24,4 +24,34 @@
 
 .user-info-wraper {
     display: block;
+    width: fit-content;
+    border: 3px solid rgb(0, 0, 0, .75);
+    padding: 5px 12px;
+    border-radius: 5px;
+}
+
+.user-info-wraper .user-row {
+    display: block;
+    width: 100%;
+    padding: .05rem 0;
+}
+
+.user-info-wraper .user-row:last-child {
+    padding-bottom: 0;
+    margin-bottom: 0;
+}
+
+.user-info-wraper .user-row .user-row-title {
+    user-select: none;
+    font-weight: bold;
+    display: inline-block;
+    width: 80px;
+    /* text-align: right; */
+    margin-right: 10px;
+}
+
+@media only screen and (max-width: 800px) {
+    .user-info-wraper {
+        width: 100%;
+    }
 }

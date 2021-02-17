@@ -41,24 +41,22 @@
                             <% } %> 
                         </div>
                         <div class="user-info-wraper">
-                            <div class="mb-1">
-                                <b>ID</b> <%= foundUser.id %>
+                            <div class="mb-1 user-row">
+                                <span class="user-row-title">ID</span><span class="user-row-content"><%= foundUser.id %></span>
                             </div>
-                            <div class="mb-1">
-                                <b>Full Name</b> <%= foundUser.firstName %> <%= foundUser.middleName %> <%= foundUser.lastName %><br>
+                            <div class="mb-1 user-row">
+                                <span class="user-row-title">Full Name</span><span class="user-row-content"><%= foundUser.firstName %> <%= foundUser.middleName %> <%= foundUser.lastName %></span>
                             </div>
-                            <div class="mb-1">
-                                <b>Birthdate</b> <%= new Date(foundUser.birthdate).toLocaleString().split(',')[0] %><br>
+                            <div class="mb-1 user-row">
+                                <span class="user-row-title">Birthdate</span><span class="user-row-content"><%= new Date(foundUser.birthdate).toLocaleString().split(',')[0] %></span>
                             </div>
-                            <div class="mb-1">
-                                <% if (user.phone != null) { %> 
-                                    <b>Phone</b> <a href="tel:<%= foundUser.phone %>"><%= foundUser.phone %></a><br>
-                                    <% } else { %> 
-                                    <b>Phone</b> <i>No phone provided</i>
-                                <% } %> 
+                            <% if (user.phone != null) { %> 
+                            <div class="mb-1 user-row">
+                                <span class="user-row-title">Phone</span><span class="user-row-content"><a href="tel:<%= foundUser.phone %>"><%= foundUser.phone %></a></span>
                             </div>
-                            <div class="mb-0">
-                                <b>Email</b> <a href="mailto:<%= foundUser.email %>"><%= foundUser.email %></a>
+                            <% } %>
+                            <div class="mb-1 user-row">
+                                <span class="user-row-title">Email</span><span class="user-row-content"><a href="mailto:<%= foundUser.email %>"><%= foundUser.email %></a></span>
                             </div>
                         </div>
                     </fieldset>

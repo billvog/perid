@@ -35,18 +35,11 @@ input:enabled:hover, input:focus {
 }
 
 input::placeholder {
-    color: hsl(210, 11%, 85%);
+    color: hsl(210, 11%, 68%);
 }
 
 input:disabled {
     color: hsl(210, 11%, 60%);
-}
-
-label.required::after {
-    content: '*';
-    color: red;
-    margin-left: 5px;
-    font-weight: 500;
 }
 
 .btn {
@@ -67,7 +60,13 @@ label.required::after {
     transition: background-color, .15s ease-in-out;
 }
 
-.btn:focus, .btn:hover {
+.btn:disabled {
+    cursor: not-allowed !important;
+    opacity: .925;
+}
+
+.btn:enabled:focus, .btn:enabled:hover,
+a.btn:focus, a.btn:hover {
     background-color: hsl(210, 11%, 75%) !important;
 }
 
@@ -77,7 +76,8 @@ label.required::after {
     color: white !important;
 }
 
-.btn.btn-dark:active, .btn.btn-dark:hover {
+.btn.btn-dark:enabled:active, .btn.btn-dark:enabled:hover,
+a.btn.btn-dark:active, a.btn.btn-dark:hover {
     background-color: hsl(210, 11%, 25%) !important;
 }
 
@@ -87,7 +87,8 @@ label.required::after {
     color: white !important;
 }
 
-.btn.btn-primary:active, .btn.btn-primary:hover {
+.btn.btn-primary:enabled:active, .btn.btn-primary:enabled:hover,
+a.btn.btn-primary:active, a.btn.btn-primary:hover {
     background-color: hsl(216, 98%, 58%) !important;
 }
 
@@ -98,7 +99,8 @@ label.required::after {
     font-weight: 500;
 }
 
-.btn.btn-success:active, .btn.btn-success:hover {
+.btn.btn-success:enabled:active, .btn.btn-success:enabled:hover,
+a.btn.btn-success:active, a.btn.btn-success:hover {
     background-color: hsl(152, 68%, 40%) !important;
 }
 
@@ -109,7 +111,8 @@ label.required::after {
     font-weight: 500;
 }
 
-.btn.btn-danger:active, .btn.btn-danger:hover {
+.btn.btn-danger:enabled:active, .btn.btn-danger:enabled:hover,
+a.btn.btn-danger:active, a.btn.btn-danger:hover {
     background-color: hsl(354, 70%, 59%) !important;
 }
 
@@ -120,7 +123,8 @@ label.required::after {
     font-weight: 500;
 }
 
-.btn.btn-warning:active, .btn.btn-warning:hover {
+.btn.btn-warning:enabled:active, .btn.btn-warning:enabled:hover,
+a.btn.btn-warning:active, a.btn.btn-warning:hover {
     background-color: hsl(45, 100%, 50%) !important;
 }
 
@@ -132,6 +136,14 @@ label.required::after {
     font-size: 10pt;
     font-weight: 500;
     color: #585858;
+}
+
+/* Required fields */
+label.required::after {
+    content: '*';
+    color: red;
+    margin-left: 5px;
+    font-weight: 500;
 }
 
 /* File select group */
@@ -211,4 +223,12 @@ form div.form-bottom-text {
 
 form .f-right {
     float: right;
+}
+
+/* Toggle password button */
+#togglePassword {
+    cursor: pointer;
+    float: right;
+    transform: translateX(-10px) translateY(-30px);
+    color: whitesmoke;
 }

@@ -18,21 +18,21 @@
             Perid
         </a>
         <div class="left-group">
-            <a class="nav-link" href="/">User Lookup</a>
-            <a class="nav-link" href="/docs/">Documention</a>
+            <a class="nav-link" href="/" title="User Search Engine">User Lookup</a>
+            <a class="nav-link" href="/docs/" title="API Documention">Documention</a>
         </div>
         <div class="right-group">
-            <div class="seperator"></div>
+            <span class="seperator"></span>
             <% if (typeof user != 'undefined') { %>
-                <a class="nav-link" href="/account/my-account" title="View Account Information">
+                <a class="nav-link" href="/account/my-account" title="My Account">
                     <%= user.firstName %> <%= user.middleName %> <%= user.lastName %>
                 </a>
-                <form action="/account/logout?_m=DELETE" method="post" title='Logout'>
+                <form action="/account/logout?_m=DELETE" method="post" title="Logout">
                     <button type="submit" class="btn btn-logout">Logout</button>
                 </form>
             <% } else { %>
-                <a class="nav-link" href="/account/login">Login</a>
-                <a class="nav-link" href="/account/register">Register</a>
+                <a class="nav-link" href="/account/login" title="Login to your Account">Login</a>
+                <a class="nav-link" href="/account/register" title="Register a new Account">Register</a>
             <% } %>
         </div>
     </div>

@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="/css/header.css">
     <link rel="stylesheet" href="/css/form.css">
     <link rel="stylesheet" href="/css/modal.css">
+    <link rel="stylesheet" href="/css/user-preview.css">
 </head>
 <body class="preload">
     <div class="content-container container">
@@ -46,25 +47,22 @@
                         <% } %> 
                     </div>
                     <div class="user-info-wraper">
-                        <div class="mb-1">
-                            <b>ID</b> <%= user.id %>
+                        <div class="mb-1 user-row">
+                            <span class="user-row-title">ID</span><span class="user-row-content"><%= user.id %></span>
                         </div>
-                        <div class="mb-1">
-                            <b>Full Name</b> <%= user.firstName %> <%= user.middleName %> <%= user.lastName %>
+                        <div class="mb-1 user-row">
+                            <span class="user-row-title">Full Name</span><span class="user-row-content"><%= user.firstName %> <%= user.middleName %> <%= user.lastName %></span>
                         </div>
-                        <div class="mb-1">
-                            <b>Birthdate</b> <%= new Date(user.birthdate).toLocaleString().split(',')[0] %>
+                        <div class="mb-1 user-row">
+                            <span class="user-row-title">Birthdate</span><span class="user-row-content"><%= new Date(user.birthdate).toLocaleString().split(',')[0] %></span>
                         </div>
-                        <div class="mb-1">
-                            <% if (user.phone != null) { %> 
-                                <!-- Phone -->
-                                <b>Phone</b> <a href="tel:<%= user.phone %>"><%= user.phone %></a>
-                            <% } else { %> 
-                                <b>Phone</b> <i>No phone provided</i>
-                            <% } %> 
+                        <% if (user.phone != null) { %> 
+                        <div class="mb-1 user-row">
+                            <span class="user-row-title">Phone</span><span class="user-row-content"><a href="tel:<%= user.phone %>"><%= user.phone %></a></span>
                         </div>
-                        <div class="mb-1">
-                            <b>Email</b> <a href="mailto:<%= user.email %>"><%= user.email %></a>
+                        <% } %>
+                        <div class="mb-1 user-row">
+                            <span class="user-row-title">Email</span><span class="user-row-content"><a href="mailto:<%= user.email %>"><%= user.email %></a></span>
                         </div>
                     </div>
                     <hr>

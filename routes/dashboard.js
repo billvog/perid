@@ -9,6 +9,7 @@ const ApiKey = require('../models/ApiKey');
 // API Access Key Plans
 const plans = [
     {
+        id: 'basic',
         title: 'Basic',
         limit: 1000
     }
@@ -45,19 +46,27 @@ router.get('/create-api-key', auth.ensureNoApiKeyRegisted, async (req, res) => {
 
 router.post('/create-api-key', auth.ensureNoApiKeyRegisted, async (req, res) => {
     const {
-        planSelect
+        plan: selectedPlan
     } = req.body;
     let errors = [];
 
-    if (!planSelect) {
+    if (!selectedPlan) {
         errors.push({ message: 'Please fill all required fields' });
     }
+    
+    var totalRequests = null;
+    if (selectedPlan) {
+        // Find plan
+        for (const plan of plans) {
+            if (selectedPlan === plan.id) {
+                totalRequests = plan.limit;
+                break;
+            }
+        }
 
-    var totalRequests = 0;
-    if (planSelect === 'Basic (1,000 / month)')
-        totalRequests = 1000;
-    else {
-        errors.push({ message: 'Please select a valid plan' });
+        if (totalRequests == null) {
+            errors.push({ message: 'Please select a valid plan' });
+        }
     }
 
     if (errors.length > 0) {
@@ -65,7 +74,7 @@ router.post('/create-api-key', auth.ensureNoApiKeyRegisted, async (req, res) => 
             user: req.user,
             errors,
             // Input Fields
-            planSelect
+            selectedPlan
         });
     }
 
@@ -83,7 +92,7 @@ router.post('/create-api-key', auth.ensureNoApiKeyRegisted, async (req, res) => 
             errors: [{ message: error.message }],
             // Input Fields
             ownerId,
-            planSelect
+            selectedPlan
         });
     });
 });
