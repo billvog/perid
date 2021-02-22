@@ -7,9 +7,9 @@ form {
 input, select {
     outline: none;
     line-height: 1.5;
-    background-color: hsl(210, 11%, 25%) !important;
+    background-color: hsl(200, 9%, 14%) !important;
     border: none;
-    color: hsl(210, 11%, 85%);
+    color: #f5e2bb;
     border-radius: 3px;
     padding: 6px 10px;
     font-family: inherit;
@@ -22,16 +22,16 @@ input, select {
 
 select {
     padding: 0;
-    border: 8px solid hsl(210, 11%, 25%);
+    border: 8px solid hsl(200, 9%, 14%);
 }
 
 select:enabled:hover {
-    border-color: hsl(210, 11%, 30%);
-    background-color: hsl(210, 11%, 30%) !important;
+    border-color: hsl(200, 9%, 19%);
+    background-color: hsl(200, 9%, 19%) !important;
 }
 
 input:enabled:hover, input:focus {
-    background-color: hsl(210, 11%, 30%) !important;
+    background-color: hsl(200, 9%, 20%) !important;
 }
 
 input::placeholder {
@@ -72,13 +72,13 @@ a.btn:focus, a.btn:hover {
 
 /* Dark button */
 .btn.btn-dark {
-    background-color: hsl(210, 11%, 20%) !important;
-    color: white !important;
+    background-color: hsl(200, 9%, 14%) !important;
+    color: #f5e2bb !important;
 }
 
 .btn.btn-dark:enabled:active, .btn.btn-dark:enabled:hover,
 a.btn.btn-dark:active, a.btn.btn-dark:hover {
-    background-color: hsl(210, 11%, 25%) !important;
+    background-color: hsl(200, 9%, 20%) !important;
 }
 
 /* Primary button */
@@ -138,6 +138,10 @@ a.btn.btn-warning:active, a.btn.btn-warning:hover {
     color: #585858;
 }
 
+label {
+    user-select: none;
+}
+
 /* Required fields */
 label.required::after {
     content: '*';
@@ -154,8 +158,10 @@ label.required::after {
 
 .file-select-group button {
     min-width: fit-content;
+    min-width: -moz-fit-content;
     border-radius: 5px 0 0 5px;
     background-color: hsl(210, 11%, 85%) !important;
+    height: 33px;
 }
 
 .file-select-group button:hover, .file-select-group button:focus {
@@ -168,6 +174,7 @@ label.required::after {
     padding: 4px 9px;
     border-radius: 0 5px 5px 0;
     word-break: break-all;
+    height: 33px;
 }
 
 .file-select-group label.wrong {

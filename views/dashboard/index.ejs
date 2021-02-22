@@ -42,17 +42,17 @@
                         <label><i class="fas fa-user"></i> Owner ID</label>
                         <input type="text" value="<%= ApiKey.ownerId %>" disabled='true'>
                     </div>
-                    <civ class="mb-2">
+                    <div class="mb-2">
                         <label><i class="fas fa-scroll"></i> Plan</label>
                         <select disabled="disabled">
                             <option selected><%= ApiKeyPlan %></option>
                         </select>
-                    </civ>
+                    </div>
                     <div class="mb-1">
                         <label><i class="fas fa-key"></i> Your API Access Key</label>
                         <div class="api-key-info-group">
                             <input class="mono-font" type="text" value="<%= ApiKey.key %>" disabled='true'>
-                            <button type="submit" class="btn resetApiKeyOpenModalBtn" title="Reset your API key" aria-describedby="resetHelpBlock">Reset</button>
+                            <button type="submit" class="btn btn-dark resetApiKeyOpenModalBtn" title="Reset your API key" aria-describedby="resetHelpBlock">Reset</button>
                         </div>
                         <div id="resetHelpBlock" class="form-text">
                             This key is secret, do not share it with 3rd parties. In case of it being exposed you can reset it.
@@ -64,7 +64,7 @@
                     <!-- API Usage -->
                     <div class="mb-1 api-mon-usage-group">
                         <div class="mb-2 group-title">
-                            <i class="fas fa-chart-area"></i> API Usage
+                            <i class="fas fa-chart-area"></i> <label>API Usage</label>
                         </div>
                         <div class="mb-0 group-content">
                             <span id="req_percent"><%= ((ApiKey.doneRequests / ApiKey.totalRequests) * 100).toFixed(1) %></span>% 

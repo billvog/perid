@@ -29,7 +29,7 @@
 }
 
 .api-mon-usage-group .group-title {
-    font-weight: 600;
+    font-weight: 500;
     font-size: 12pt;
 }
 
@@ -43,6 +43,7 @@
     padding: 4px 10px;
     border-radius: 5px;
     width: fit-content;
+    width: -moz-fit-content;
 }
 
 .api-mon-usage-group .group-content span {
