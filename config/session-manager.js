@@ -1,64 +1,67 @@
 const jwt = require('jsonwebtoken');
+const { generateAccessToken, generateRefreshToken } = require('./userTokens');
 
 // Models
 const User = require('../models/User');
 
-module.exports = async function(req, res, next) {
-    // Check if session id exists
-    if ((req.cookies.sessid != null && req.cookies.sessid.length > 0) && !req.isAuthenticated()) {
-        try {
-            // Get assoc uid from jwt
-            const {
-                user: id,
-                type
-            } = jwt.verify(req.cookies.sessid, process.env.JWT_SECRET);
-            const user = await User.findOne({ _id: id });
+module.exports = async function (req, res, next) {
+  // Check if Access Token
+  if (req.cookies.accessToken != null) {
+    try {
+      // Get assoc uid from jwt
+      const { userId: id } = jwt.verify(
+        req.cookies.accessToken,
+        process.env.JWT_ACCESS_TOKEN_SECRET
+      );
+      const user = await User.findOne({ _id: id });
 
-            // Clear cookie
-            res.cookie('sessid', '', { maxAge: 0 });
-
-            if (type == 'sessid' && user != null) {
-                // Login found user
-                req.login(user, (e) => {
-                    if (e) throw e;
-                });
-    
-                // Create new session
-                const sessid = await jwt.sign({
-                    user: user.id,
-                    type: 'sessid'
-                }, process.env.JWT_SECRET, {
-                    expiresIn: '30d'
-                });
-
-                // Save token in cookie
-                res.cookie('sessid', sessid, {
-                    maxAge: 2592000000 // 30 days
-                });
-            }
-        }
-        catch (error) {
-            console.log(error);
-            
-            // Clear cookie
-            res.cookie('sessid', '', { maxAge: 0 });
-        }
-    }
-    // Check if user is authenticated
-    else if ((req.cookies.sessid == null || req.cookies.sessid.length <= 0) && req.isAuthenticated()) {
-        // Create new session
-        const sessid = await jwt.sign({
-            user: req.user.id,
-            type: 'sessid'
-        }, process.env.JWT_SECRET, {
-            expiresIn: '30d'
+      if (user != null) {
+        // Login found user
+        req.login(user, (e) => {
+          if (e) throw e;
         });
-        
-        // Save token in cookie
-        res.cookie('sessid', sessid, {
-            maxAge: 2592000000 // 30 days
-        });
-    }
+      }
+    } catch (error) {
+      console.log(error);
 
-    next();
+      // Clear cookie
+      res.cookie('accessToken', '', { maxAge: 0 });
+      res.cookie('refreshToken', '', { maxAge: 0 });
+    }
+  }
+  // Check if Refresh Token exists
+  // so the Access Token can be refreshed
+  else if (req.cookies.refreshToken != null) {
+    try {
+      // Get assoc uid from jwt
+      const { userId: id, tokenVersion } = jwt.verify(
+        req.cookies.refreshToken,
+        process.env.JWT_REFRESH_TOKEN_SECRET
+      );
+      const user = await User.findOne({ _id: id });
+
+      if (tokenVersion !== user.tokenVersion) {
+        throw new Error('invalid token version number');
+      }
+
+      if (user != null) {
+        // Generate tokens
+        await generateAccessToken(user, res);
+        await generateRefreshToken(user, res);
+
+        // Login found user
+        req.login(user, (e) => {
+          if (e) throw e;
+        });
+      }
+    } catch (error) {
+      console.log(error);
+
+      // Clear cookie
+      res.cookie('accessToken', '', { maxAge: 0 });
+      res.cookie('refreshToken', '', { maxAge: 0 });
+    }
+  }
+
+  next();
 };
